@@ -133,3 +133,19 @@ export class TestPlanAsset {
   public dateUpdated: string;
 
 }
+
+// role asset class 
+@Object()
+export class RoleAsset {
+  @Property()
+  public roleId: string;
+
+  @Property()
+  public roleName: string;
+
+  @Property()
+  public description: string;
+
+  @Property()
+  public isActive: string;
+}
