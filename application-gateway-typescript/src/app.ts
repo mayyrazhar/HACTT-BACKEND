@@ -653,6 +653,21 @@ async function main(): Promise<void> {
             }
         });*/
 
+        /*********Role APIs Functions*********** */
+        // CREATE ROLE
+        app.post('/createRole', async (req: any, res: any) => {
+            console.log("Create Role:");
+            console.log(req.body);
+            try {
+                await createRole(contract, req.body.roleId, req.body.roleName, req.body.description, req.body.isActive);
+                const successMessage = { status: 'success', message: '*** Transaction createRole committed successfully' };
+                res.send(JSON.stringify(successMessage));
+            } catch (error) {
+                console.error(`Failed to create role: ${error}`);
+                res.status(500).json({ error: error.message });
+            }
+        });
+
         app.listen(port, () => {
             console.log(`Example app listening on port ${port}`)
         })
@@ -699,6 +714,9 @@ async function main(): Promise<void> {
         // gateway.close();
         // client.close();
     }
+
+
+
 }
 
 main().catch(error => {
@@ -1336,3 +1354,11 @@ async function GetTestPlansForTestSuite(contract: Contract, tsID: string): Promi
         throw new Error(`Failed to fetch Test Plans for TestSuiteID ${tsID}. Error: ${error.message}`);
     }
 }
+
+/************Role Module Functions ****************/
+
+async function createRole(contract: Contract, roleId: string, roleName: string, description: string, isActive: string): Promise<void> {
+    console.log('--> Submit Transaction: CreateRole');
+    await contract.submitTransaction('CreateRole', roleId, roleName, description, isActive);
+    console.log('*** Role committed successfully');
+  }
