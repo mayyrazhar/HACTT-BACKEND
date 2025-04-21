@@ -3,10 +3,10 @@
  */
 // Deterministic JSON.stringify()
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
+import { ClientIdentity } from 'fabric-shim';
 import stringify from 'json-stringify-deterministic';
 import sortKeysRecursive from 'sort-keys-recursive';
-import { ClientIdentity } from 'fabric-shim';
-import { tmpdir } from 'os';
+import { RoleAsset } from './asset';
 
 @Info({ title: 'AssetTransfer', description: 'Smart contract for trading assets' }) //for doc purpose
 export class AssetTransferContract extends Contract {
@@ -846,4 +846,33 @@ export class AssetTransferContract extends Contract {
         return JSON.stringify(testPlanNames);
     }*/
 
+
+    /*************Role Module******************/
+    // CREATE
+    @Transaction()
+    public async CreateRole(ctx: Context, roleId: string, roleName: string, description: string, isActive: string): Promise<void> {
+        const exists = await this.RoleExists(ctx, roleId);
+        if (exists) {
+            throw new Error(`The role ${roleId} already exists`);
+        }
+
+        const role: RoleAsset = {
+            roleId,
+            roleName,
+            description,
+            isActive,
+        };
+
+        await ctx.stub.putState(roleId, Buffer.from(JSON.stringify(role)));
+    }
+
+    // EXISTS
+    @Transaction(false)
+    @Returns('boolean')
+    public async RoleExists(ctx: Context, roleId: string): Promise<boolean> {
+        const roleJSON = await ctx.stub.getState(roleId);
+        return roleJSON && roleJSON.length > 0;
+    }
+
+    
 }
