@@ -905,6 +905,29 @@ export class AssetTransferContract extends Contract {
         await ctx.stub.deleteState(roleId);
     }
 
+    // ROLE GET ALL
+    @Transaction(false)
+    @Returns('RoleAsset[]')
+    public async GetAllRoles(ctx: Context): Promise<RoleAsset[]> {
+        const allResults: RoleAsset[] = [];
+        const iterator = await ctx.stub.getStateByRange('', '');
+        let result = await iterator.next();
+
+        while (!result.done) {
+            const strValue = result.value.value.toString('utf8');
+            try {
+                const record = JSON.parse(strValue);
+                if (record.roleId) {
+                    allResults.push(record as RoleAsset);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+            result = await iterator.next();
+        }
+        return allResults;
+    }
+
     // ROLE EXISTS
     @Transaction(false)
     @Returns('boolean')
