@@ -695,6 +695,30 @@ async function main(): Promise<void> {
             }
         });
 
+        // DELETE ROLE
+        app.delete('/deleteRole/:id', async (req: any, res: any) => {
+            const roleId = req.params.id;
+            console.log(`Delete Role: ${roleId}`);
+            try {
+                await deleteRole(contract, roleId);
+                res.send({ status: 'success', message: `Role ${roleId} deleted successfully` });
+            } catch (error) {
+                console.error(`Failed to delete role: ${error}`);
+                res.status(500).json({ error: error.message });
+            }
+        });
+
+        // GET ALL ROLES
+        app.get('/getAllRoles', async (req: any, res: any) => {
+            try {
+                const roles = await getAllRoles(contract);
+                res.send(roles);
+            } catch (error) {
+                console.error(`Failed to get all roles: ${error}`);
+                res.status(500).json({ error: error.message });
+            }
+        });
+
 
         app.listen(port, () => {
             console.log(`Example app listening on port ${port}`)
@@ -1401,4 +1425,16 @@ async function updateRole(contract: Contract, roleId: string, roleName: string, 
     console.log('--> Submit Transaction: UpdateRole');
     await contract.submitTransaction('UpdateRole', roleId, roleName, description, isActive);
     console.log('*** Role updated successfully');
+}
+
+async function deleteRole(contract: Contract, roleId: string): Promise<void> {
+    console.log('--> Submit Transaction: DeleteRole');
+    await contract.submitTransaction('DeleteRole', roleId);
+    console.log('*** Role deleted successfully');
+}
+
+async function getAllRoles(contract: Contract): Promise<any[]> {
+    console.log('--> Evaluate Transaction: GetAllRoles');
+    const result = await contract.evaluateTransaction('GetAllRoles');
+    return JSON.parse(result.toString());
 }
