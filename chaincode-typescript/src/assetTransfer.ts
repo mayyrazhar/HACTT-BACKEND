@@ -848,7 +848,7 @@ export class AssetTransferContract extends Contract {
 
 
     /*************Role Module******************/
-    // CREATE
+    // ROLE CREATE
     @Transaction()
     public async CreateRole(ctx: Context, roleId: string, roleName: string, description: string, isActive: string): Promise<void> {
         const exists = await this.RoleExists(ctx, roleId);
@@ -866,7 +866,7 @@ export class AssetTransferContract extends Contract {
         await ctx.stub.putState(roleId, Buffer.from(JSON.stringify(role)));
     }
 
-    // READ
+    // ROLE READ
     @Transaction(false)
     @Returns('RoleAsset')
     public async ReadRole(ctx: Context, roleId: string): Promise<RoleAsset> {
@@ -877,6 +877,34 @@ export class AssetTransferContract extends Contract {
         return JSON.parse(roleJSON.toString()) as RoleAsset;
     }
 
+    // ROLE UPDATE
+    @Transaction()
+    public async UpdateRole(ctx: Context, roleId: string, roleName: string, description: string, isActive: string): Promise<void> {
+        const exists = await this.RoleExists(ctx, roleId);
+        if (!exists) {
+            throw new Error(`The role ${roleId} does not exist`);
+        }
+
+        const updatedRole: RoleAsset = {
+            roleId,
+            roleName,
+            description,
+            isActive,
+        };
+
+        await ctx.stub.putState(roleId, Buffer.from(JSON.stringify(updatedRole)));
+    }
+
+    // ROLE DELETE
+    @Transaction()
+    public async DeleteRole(ctx: Context, roleId: string): Promise<void> {
+        const exists = await this.RoleExists(ctx, roleId);
+        if (!exists) {
+            throw new Error(`The role ${roleId} does not exist`);
+        }
+        await ctx.stub.deleteState(roleId);
+    }
+
     // ROLE EXISTS
     @Transaction(false)
     @Returns('boolean')
@@ -885,5 +913,5 @@ export class AssetTransferContract extends Contract {
         return roleJSON && roleJSON.length > 0;
     }
 
-    
+
 }
