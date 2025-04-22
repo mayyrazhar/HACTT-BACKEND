@@ -668,10 +668,6 @@ async function main(): Promise<void> {
             }
         });
 
-        app.listen(port, () => {
-            console.log(`Example app listening on port ${port}`)
-        })
-
         // GET ROLE BY ID
         app.get('/getRole/:id', async (req: any, res: any) => {
             const roleId = req.params.id;
@@ -684,6 +680,25 @@ async function main(): Promise<void> {
                 res.status(404).json({ error: error.message });
             }
         });
+
+        // UPDATE ROLE
+        app.put('/updateRole', async (req: any, res: any) => {
+            console.log("Update Role:");
+            console.log(req.body);
+            try {
+                await updateRole(contract, req.body.roleId, req.body.roleName, req.body.description, req.body.isActive);
+                const successMessage = { status: 'success', message: '*** Transaction updateRole committed successfully' };
+                res.send(JSON.stringify(successMessage));
+            } catch (error) {
+                console.error(`Failed to update role: ${error}`);
+                res.status(500).json({ error: error.message });
+            }
+        });
+
+
+        app.listen(port, () => {
+            console.log(`Example app listening on port ${port}`)
+        })
 
         // console.log(`Example app listening on port`)
 
@@ -1380,4 +1395,10 @@ async function readRole(contract: Contract, roleId: string): Promise<any> {
     console.log('--> Evaluate Transaction: ReadRole');
     const result = await contract.evaluateTransaction('ReadRole', roleId);
     return JSON.parse(result.toString());
+}
+
+async function updateRole(contract: Contract, roleId: string, roleName: string, description: string, isActive: string): Promise<void> {
+    console.log('--> Submit Transaction: UpdateRole');
+    await contract.submitTransaction('UpdateRole', roleId, roleName, description, isActive);
+    console.log('*** Role updated successfully');
 }
