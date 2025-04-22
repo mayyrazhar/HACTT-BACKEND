@@ -672,6 +672,19 @@ async function main(): Promise<void> {
             console.log(`Example app listening on port ${port}`)
         })
 
+        // GET ROLE BY ID
+        app.get('/getRole/:id', async (req: any, res: any) => {
+            const roleId = req.params.id;
+            console.log(`Get Role: ${roleId}`);
+            try {
+                const result = await readRole(contract, roleId);
+                res.send(result);
+            } catch (error) {
+                console.error(`Failed to get role: ${error}`);
+                res.status(404).json({ error: error.message });
+            }
+        });
+
         // console.log(`Example app listening on port`)
 
         // Create a new asset on the ledger.
@@ -1361,4 +1374,10 @@ async function createRole(contract: Contract, roleId: string, roleName: string, 
     console.log('--> Submit Transaction: CreateRole');
     await contract.submitTransaction('CreateRole', roleId, roleName, description, isActive);
     console.log('*** Role committed successfully');
-  }
+}
+
+async function readRole(contract: Contract, roleId: string): Promise<any> {
+    console.log('--> Evaluate Transaction: ReadRole');
+    const result = await contract.evaluateTransaction('ReadRole', roleId);
+    return JSON.parse(result.toString());
+}

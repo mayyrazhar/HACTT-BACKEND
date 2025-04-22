@@ -866,7 +866,18 @@ export class AssetTransferContract extends Contract {
         await ctx.stub.putState(roleId, Buffer.from(JSON.stringify(role)));
     }
 
-    // EXISTS
+    // READ
+    @Transaction(false)
+    @Returns('RoleAsset')
+    public async ReadRole(ctx: Context, roleId: string): Promise<RoleAsset> {
+        const roleJSON = await ctx.stub.getState(roleId);
+        if (!roleJSON || roleJSON.length === 0) {
+            throw new Error(`The role ${roleId} does not exist`);
+        }
+        return JSON.parse(roleJSON.toString()) as RoleAsset;
+    }
+
+    // ROLE EXISTS
     @Transaction(false)
     @Returns('boolean')
     public async RoleExists(ctx: Context, roleId: string): Promise<boolean> {
