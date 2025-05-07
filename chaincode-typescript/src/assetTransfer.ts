@@ -936,5 +936,8 @@ export class AssetTransferContract extends Contract {
         return roleJSON && roleJSON.length > 0;
     }
 
+    /***********User Management Module**************/
+    
+
 
 }

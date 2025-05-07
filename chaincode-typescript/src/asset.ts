@@ -149,3 +149,26 @@ export class RoleAsset {
   @Property()
   public isActive: string;
 }
+
+// User Asset class
+@Object()
+export class UserAsset {
+  @Property()
+  public userId: string;
+
+  @Property()
+  public email: string;
+
+  @Property()
+  public username: string;
+
+  @Property()
+  public password: string;
+
+  @Property()
+  public roleId: string;
+
+  @Property()
+  public resetToken: string;
+}
+
