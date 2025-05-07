@@ -719,6 +719,94 @@ async function main(): Promise<void> {
             }
         });
 
+        /********* User APIs **********/
+
+        // CREATE USER
+        app.post('/createUser', async (req: any, res: any) => {
+            console.log("Create User:");
+            console.log(req.body);
+            try {
+                await createUser(
+                    contract,
+                    req.body.userId,
+                    req.body.email,
+                    req.body.username,
+                    req.body.password,
+                    req.body.roleId
+                );
+                const successMessage = {
+                    status: 'success',
+                    message: '*** Transaction createUser committed successfully'
+                };
+                res.send(JSON.stringify(successMessage));
+            } catch (error) {
+                console.error(`Failed to create user: ${error}`);
+                res.status(500).json({ error: error.message });
+            }
+        });
+
+        // GET USER BY ID
+        app.get('/getUser/:id', async (req: any, res: any) => {
+            const userId = req.params.id;
+            console.log(`Get User: ${userId}`);
+            try {
+                const result = await readUser(contract, userId);
+                res.send(result);
+            } catch (error) {
+                console.error(`Failed to get user: ${error}`);
+                res.status(404).json({ error: error.message });
+            }
+        });
+
+        // UPDATE USER
+        app.put('/updateUser', async (req: any, res: any) => {
+            console.log("Update User:");
+            console.log(req.body);
+            try {
+                await updateUser(
+                    contract,
+                    req.body.userId,
+                    req.body.email,
+                    req.body.username,
+                    req.body.password,
+                    req.body.roleId,
+                    req.body.resetToken
+                );
+                const successMessage = {
+                    status: 'success',
+                    message: '*** Transaction updateUser committed successfully'
+                };
+                res.send(JSON.stringify(successMessage));
+            } catch (error) {
+                console.error(`Failed to update user: ${error}`);
+                res.status(500).json({ error: error.message });
+            }
+        });
+
+        // DELETE USER
+        app.delete('/deleteUser/:id', async (req: any, res: any) => {
+            const userId = req.params.id;
+            console.log(`Delete User: ${userId}`);
+            try {
+                await deleteUser(contract, userId);
+                res.send({ status: 'success', message: `User ${userId} deleted successfully` });
+            } catch (error) {
+                console.error(`Failed to delete user: ${error}`);
+                res.status(500).json({ error: error.message });
+            }
+        });
+
+        // GET ALL USERS
+        app.get('/getAllUsers', async (req: any, res: any) => {
+            try {
+                const users = await getAllUsers(contract);
+                res.send(users);
+            } catch (error) {
+                console.error(`Failed to get all users: ${error}`);
+                res.status(500).json({ error: error.message });
+            }
+        });
+  
 
         app.listen(port, () => {
             console.log(`Example app listening on port ${port}`)
@@ -1407,7 +1495,7 @@ async function GetTestPlansForTestSuite(contract: Contract, tsID: string): Promi
     }
 }
 
-/************Role Module Functions ****************/
+/************Role Module Helper Functions ****************/
 
 async function createRole(contract: Contract, roleId: string, roleName: string, description: string, isActive: string): Promise<void> {
     console.log('--> Submit Transaction: CreateRole');
@@ -1438,3 +1526,36 @@ async function getAllRoles(contract: Contract): Promise<any[]> {
     const result = await contract.evaluateTransaction('GetAllRoles');
     return JSON.parse(result.toString());
 }
+
+/************User Module Helper Functions ****************/
+
+async function createUser(contract: Contract, userId: string, email: string, username: string, password: string, roleId: string): Promise<void> {
+    console.log('--> Submit Transaction: CreateUser');
+    await contract.submitTransaction('CreateUser', userId, email, username, password, roleId);
+    console.log('*** User created successfully');
+}
+
+async function readUser(contract: Contract, userId: string): Promise<any> {
+    console.log('--> Evaluate Transaction: ReadUser');
+    const result = await contract.evaluateTransaction('ReadUser', userId);
+    return JSON.parse(result.toString());
+}
+
+async function updateUser(contract: Contract, userId: string, email: string, username: string, password: string, roleId: string, resetToken: string): Promise<void> {
+    console.log('--> Submit Transaction: UpdateUser');
+    await contract.submitTransaction('UpdateUser', userId, email, username, password, roleId, resetToken);
+    console.log('*** User updated successfully');
+}
+
+async function deleteUser(contract: Contract, userId: string): Promise<void> {
+    console.log('--> Submit Transaction: DeleteUser');
+    await contract.submitTransaction('DeleteUser', userId);
+    console.log('*** User deleted successfully');
+}
+
+async function getAllUsers(contract: Contract): Promise<any[]> {
+    console.log('--> Evaluate Transaction: GetAllUsers');
+    const result = await contract.evaluateTransaction('GetAllUsers');
+    return JSON.parse(result.toString());
+}
+  
