@@ -7,12 +7,14 @@
 //Test Havi
 
 import * as grpc from "@grpc/grpc-js";
+import HttpError from "./utils/customError";
 import {
   connect,
   Contract,
   Identity,
   Signer,
   signers,
+  StatusCode,
 } from "@hyperledger/fabric-gateway";
 import * as crypto from "crypto";
 import { promises as fs } from "fs";
@@ -105,13 +107,13 @@ async function main(): Promise<void> {
   });
 
   try {
-    let network; // Global network variable
+    let network = gateway.getNetwork(channelName); // Global network variable
     let contract; // Global contract variable
 
     // Initialize network and contract based on the current channelName and chaincodeName
     const initializeNetworkAndContract = async () => {
       try {
-        network = await gateway.getNetwork(channelName); // Initialize the network
+        network = gateway.getNetwork(channelName); // Initialize the network
         contract = network.getContract(chaincodeName); // Initialize the contract
         console.log(
           `Connected to channel: ${channelName}, chaincode: ${chaincodeName}`
@@ -169,98 +171,225 @@ async function main(): Promise<void> {
     // })
 
     app.get("/getAllTestCases", async (req: any, res: any) => {
-      const allResults = await getAllTestCases(contract);
-      const successMessage = { status: "success", message: allResults };
-      res.send(JSON.stringify(successMessage));
+      try {
+        // Fetch all test cases from the contract
+        const allResults = await getAllTestCases(contract);
+
+        // Log the number of test cases retrieved
+        console.log(`Retrieved ${allResults.length} test cases`);
+
+        // Prepare a structured success message with the results
+        const successMessage = {
+          status: "success",
+          message: "Test cases retrieved successfully",
+          data: allResults, // Include the actual test cases in the response
+        };
+
+        // Explicitly set the Content-Type header to application/json
+        res.setHeader("Content-Type", "application/json");
+        res.status(200).json(successMessage); // Send the success response
+      } catch (error) {
+        console.error("Error fetching test cases:", error);
+
+        // Prepare the error message with detailed information
+        const errorMessage = {
+          status: "error",
+          message: "Failed to fetch test cases",
+          error: error instanceof Error ? error.message : "Unknown error", // Handle non-standard errors gracefully
+        };
+
+        // Explicitly set the Content-Type header to application/json
+        res.setHeader("Content-Type", "application/json");
+        res.status(500).json(errorMessage); // Send the error response
+      }
     });
 
     app.get("/getAllTestCasesWithHistory", async (req: any, res: any) => {
       try {
+        // Fetch all test cases with history from the contract
         const allResults = await getAllTestCasesWithHistory(contract);
-        const successMessage = { status: "success", message: allResults };
-        res.send(JSON.stringify(successMessage)); // Only response sent
+
+        // Log the number of test cases retrieved for debugging purposes
+        console.log(`Retrieved ${allResults.length} test cases with history`);
+
+        // Prepare the success message with a structured response
+        const successMessage = {
+          status: "success",
+          message: "Test cases with history retrieved successfully",
+          data: allResults, // Include the actual data in the response
+        };
+
+        // Explicitly set the Content-Type header to application/json
+        res.setHeader("Content-Type", "application/json");
+        res.status(200).json(successMessage); // Send the structured response
       } catch (error) {
         console.error("Error fetching test cases:", error);
-        res
-          .status(500)
-          .json({ status: "error", message: "Failed to fetch test cases" });
+
+        // Prepare the error response with detailed error message
+        const errorMessage = {
+          status: "error",
+          message: "Failed to fetch test cases",
+          error: error instanceof Error ? error.message : "Unknown error", // Handle non-standard errors gracefully
+        };
+
+        // Explicitly set the Content-Type header to application/json
+        res.setHeader("Content-Type", "application/json");
+        res.status(500).json(errorMessage); // Send error response
       }
     });
 
     app.get("/getAllTestPlans", async (req: any, res: any) => {
       try {
+        // Fetch all test plans from the contract
         const allResults = await getAllTestPlans(contract);
-        const successMessage = { status: "success", message: allResults };
+
+        // Log the number of test plans retrieved for debugging purposes
+        console.log(`Retrieved ${allResults.length} test plans`);
+
+        // Prepare the success message with a structured response
+        const successMessage = {
+          status: "success",
+          message: "Test plans retrieved successfully",
+          data: allResults, // Include the actual data in the response
+        };
 
         // Explicitly set the Content-Type header to application/json
         res.setHeader("Content-Type", "application/json");
-        res.status(200).json(successMessage);
+        res.status(200).json(successMessage); // Send the structured response
       } catch (error) {
-        console.error("Error retrieving test plans:", error);
+        console.error("Error fetching test plans:", error);
 
-        // Return an error response as JSON
-        res.setHeader("Content-Type", "application/json");
-        res.status(500).json({
+        // Prepare the error response with detailed error message
+        const errorMessage = {
           status: "error",
           message: "Failed to retrieve test plans",
-          error: error,
-        });
+          error: error instanceof Error ? error.message : "Unknown error", // Handle non-standard errors gracefully
+        };
+
+        // Explicitly set the Content-Type header to application/json
+        res.setHeader("Content-Type", "application/json");
+        res.status(500).json(errorMessage); // Send error response
       }
     });
 
     app.get("/getAllTestPlansWithHistory", async (req: any, res: any) => {
       try {
+        // Fetch all test plans with history from the contract
         const allResults = await getAllTestPlansWithHistory(contract);
-        const successMessage = { status: "success", message: allResults };
-        res.send(JSON.stringify(successMessage)); // Only response sent
+
+        // Log the number of test plans retrieved for debugging purposes
+        console.log(`Retrieved ${allResults.length} test plans with history`);
+
+        // Prepare the success message with a structured response
+        const successMessage = {
+          status: "success",
+          message: "Test plans with history retrieved successfully",
+          data: allResults, // Include the actual data in the response
+        };
+
+        // Explicitly set the Content-Type header to application/json
+        res.setHeader("Content-Type", "application/json");
+        res.status(200).json(successMessage); // Send the structured response
       } catch (error) {
-        console.error("Error fetching test cases:", error);
-        res
-          .status(500)
-          .json({ status: "error", message: "Failed to fetch test cases" });
+        console.error("Error fetching test plans with history:", error);
+
+        // Prepare the error response with detailed error message
+        const errorMessage = {
+          status: "error",
+          message: "Failed to fetch test plans with history",
+          error: error instanceof Error ? error.message : "Unknown error", // Handle non-standard errors gracefully
+        };
+
+        // Explicitly set the Content-Type header to application/json
+        res.setHeader("Content-Type", "application/json");
+        res.status(500).json(errorMessage); // Send error response
       }
     });
 
     //getAllTestSuites
     app.get("/getAllTestSuites", async (req: any, res: any) => {
       try {
+        // Fetch all test suites from the contract
         const allResults = await getAllTestSuites(contract);
-        const successMessage = { status: "success", message: allResults };
+
+        // Log the number of test suites retrieved for debugging purposes
+        console.log(`Retrieved ${allResults.length} test suites`);
+
+        // Prepare the success message with a structured response
+        const successMessage = {
+          status: "success",
+          message: "Test suites retrieved successfully",
+          data: allResults, // Include the actual data in the response
+        };
 
         // Explicitly set the Content-Type header to application/json
         res.setHeader("Content-Type", "application/json");
-        res.status(200).json(successMessage);
+        res.status(200).json(successMessage); // Send the structured response
       } catch (error) {
-        console.error("Error retrieving test plans:", error);
+        console.error("Error retrieving test suites:", error);
 
-        // Return an error response as JSON
-        res.setHeader("Content-Type", "application/json");
-        res.status(500).json({
+        // Prepare the error response with detailed error message
+        const errorMessage = {
           status: "error",
-          message: "Failed to retrieve test plans",
-          error: error,
-        });
+          message: "Failed to retrieve test suites",
+          error: error instanceof Error ? error.message : "Unknown error", // Handle non-standard errors gracefully
+        };
+
+        // Explicitly set the Content-Type header to application/json
+        res.setHeader("Content-Type", "application/json");
+        res.status(500).json(errorMessage); // Send error response
       }
     });
 
     app.get("/getAllBuildsWithHistory", async (req: any, res: any) => {
       try {
+        // Fetch all builds with history from the contract
         const allResults = await getAllBuildsWithHistory(contract);
-        const successMessage = { status: "success", message: allResults };
-        res.send(JSON.stringify(successMessage)); // Only response sent
+
+        // Log the number of builds retrieved for debugging purposes
+        console.log(`Retrieved ${allResults.length} builds with history`);
+
+        // Prepare the success message with a structured response
+        const successMessage = {
+          status: "success",
+          message: "Builds with history retrieved successfully",
+          data: allResults, // Include the actual data in the response
+        };
+
+        // Explicitly set the Content-Type header to application/json
+        res.setHeader("Content-Type", "application/json");
+        res.status(200).json(successMessage); // Send a structured response
       } catch (error) {
-        console.error("Error fetching builds:", error);
-        res
-          .status(500)
-          .json({ status: "error", message: "Failed to fetch builds" });
+        console.error("Error fetching builds with history:", error);
+
+        // Prepare the error response with detailed error message
+        const errorMessage = {
+          status: "error",
+          message: "Failed to fetch builds with history",
+          error: error instanceof Error ? error.message : "Unknown error", // Handle non-standard errors gracefully
+        };
+
+        // Explicitly set the Content-Type header to application/json
+        res.setHeader("Content-Type", "application/json");
+        res.status(500).json(errorMessage); // Send error response
       }
     });
 
     //getAllTestSuites
     app.get("/getAllBuilds", async (req: any, res: any) => {
       try {
+        // Fetch all builds from the contract
         const allResults = await getAllBuilds(contract);
-        const successMessage = { status: "success", message: allResults };
+
+        // Log the number of builds retrieved for debugging purposes
+        console.log(`Retrieved ${allResults.length} builds`);
+
+        // Prepare the success message
+        const successMessage = {
+          status: "success",
+          message: "Builds retrieved successfully",
+          data: allResults, // Include the actual build data in the response
+        };
 
         // Explicitly set the Content-Type header to application/json
         res.setHeader("Content-Type", "application/json");
@@ -268,42 +397,86 @@ async function main(): Promise<void> {
       } catch (error) {
         console.error("Error retrieving builds:", error);
 
-        // Return an error response as JSON
-        res.setHeader("Content-Type", "application/json");
-        res.status(500).json({
+        // Prepare the error response with additional details
+        const errorMessage = {
           status: "error",
           message: "Failed to retrieve builds",
-          error: error,
-        });
+          error: error instanceof Error ? error.message : "Unknown error", // Handle error.message in case of a regular error object
+        };
+
+        // Explicitly set the Content-Type header to application/json
+        res.setHeader("Content-Type", "application/json");
+        res.status(500).json(errorMessage);
       }
     });
 
     // Create a new asset on the ledger.
     app.post("/createTestCase", async (req: any, res: any) => {
-      console.log("Create Test Case:");
-      console.log(req.body);
+      console.log("Received request body:", req.body);
+
+      // Validate required fields
+      const requiredFields = [
+        "id",
+        "tcdesc",
+        "dl",
+        "pid",
+        "tcn",
+        "dtc",
+        "usrn",
+        "ostts",
+        "tcSteps",
+      ];
+
+      for (let field of requiredFields) {
+        if (!req.body[field]) {
+          return res
+            .status(400)
+            .json({ error: `Missing required field: ${field}` });
+        }
+      }
+
+      const { id, tcdesc, dl, pid, tcn, dtc, usrn, ostts, tcSteps } = req.body;
+
+      console.log("Creating Test Case:");
+      console.log(`Test Case ID: ${id}`);
+      console.log(`Description: ${tcdesc}, DL: ${dl}, PID: ${pid}`);
+      console.log(`Test Case Number: ${tcn}, Date Created: ${dtc}`);
+      console.log(`Username: ${usrn}, Status: ${ostts}`);
+      console.log(`Test Case Steps: ${tcSteps.length} steps`);
 
       try {
+        // Call the function to create the test case
         await createAsset(
           contract,
-          req.body.id,
-          req.body.tcdesc,
-          req.body.dl,
-          req.body.pid,
-          req.body.tcn,
-          req.body.dtc,
-          req.body.usrn,
-          req.body.ostts,
-          req.body.tcSteps
+          id,
+          tcdesc,
+          dl,
+          pid,
+          tcn,
+          dtc,
+          usrn,
+          ostts,
+          tcSteps
         );
+
         const successMessage = {
           status: "success",
           message: "*** Transaction createAsset committed successfully",
         };
-        res.send(JSON.stringify(successMessage));
+
+        res.status(200).json(successMessage);
       } catch (error) {
         console.error("Error creating test case:", error);
-        res.status(500).json({ error: error });
+
+        // Return a detailed error message
+        if (error instanceof Error) {
+          return res.status(500).json({ error: error.message });
+        }
+
+        // Return a generic error if the error type is unknown
+        return res.status(500).json({
+          error: "An unexpected error occurred while creating the test case.",
+        });
       }
     });
 
@@ -311,33 +484,57 @@ async function main(): Promise<void> {
     app.post("/updateTestCase", async (req: any, res: any) => {
       console.log("Received request body:", req.body);
 
-      // Check if required fields (id) are present
-      if (!req.body.id) {
-        return res.status(400).json({ error: "Missing required field: id" });
+      // Check if the required fields are present in the request body
+      const requiredFields = [
+        "id",
+        "tcdesc",
+        "dl",
+        "pid",
+        "tcn",
+        "dtc",
+        "usrn",
+        "ostts",
+      ];
+
+      for (let field of requiredFields) {
+        if (!req.body[field]) {
+          return res
+            .status(400)
+            .json({ error: `Missing required field: ${field}` });
+        }
       }
+
+      const { id, tcdesc, dl, pid, tcn, dtc, usrn, ostts } = req.body;
+
       console.log("Update Test Case:");
-      console.log(req.body);
+      console.log(`Test Case ID: ${id}`);
+      console.log(
+        `Description: ${tcdesc}, DL: ${dl}, PID: ${pid}, Test Case Number: ${tcn}`
+      );
+      console.log(`Date Created: ${dtc}, Username: ${usrn}, Status: ${ostts}`);
 
       try {
-        await UpdateAsset(
-          contract,
-          req.body.id,
-          req.body.tcdesc,
-          req.body.dl,
-          req.body.pid,
-          req.body.tcn,
-          req.body.dtc,
-          req.body.usrn,
-          req.body.ostts
-        );
+        // Call the function to update the test case
+        await UpdateAsset(contract, id, tcdesc, dl, pid, tcn, dtc, usrn, ostts);
+
         const successMessage = {
           status: "success",
           message: "Test case updated successfully",
         };
-        res.send(JSON.stringify(successMessage));
+
+        res.status(200).json(successMessage);
       } catch (error) {
         console.error("Error updating test case:", error);
-        res.status(500).json({ error: error });
+
+        // Handle known error type for clearer debugging
+        if (error instanceof Error) {
+          return res.status(500).json({ error: error.message });
+        }
+
+        // Handle any unknown error type
+        return res
+          .status(500)
+          .json({ error: "Unknown error occurred while updating test case" });
       }
     });
 
@@ -345,62 +542,121 @@ async function main(): Promise<void> {
     app.post("/updateTestCaseStatus", async (req: any, res: any) => {
       console.log("Received request body:", req.body);
 
-      // Check if required fields (id) are present
-      if (!req.body.id) {
-        return res.status(400).json({ error: "Missing required field: id" });
+      // Check if the required fields ('id' and 'ostts') are present
+      if (!req.body.id || !req.body.ostts) {
+        return res
+          .status(400)
+          .json({ error: "Missing required fields: id or ostts" });
       }
+
+      const testCaseID = req.body.id;
+      const newStatus = req.body.ostts;
+
       console.log("Update Test Case Status:");
-      console.log(req.body);
+      console.log(`Test Case ID: ${testCaseID}, New Status: ${newStatus}`);
 
       try {
-        await UpdateTestCaseStatus(contract, req.body.id, req.body.ostts);
+        // Call the function to update the test case status
+        const result = await UpdateTestCaseStatus(
+          contract,
+          testCaseID,
+          newStatus
+        );
+
+        // If the update is successful, return a success message
         const successMessage = {
           status: "success",
           message: "Test case status updated successfully",
         };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
+
+        // Send back the success message
+        res.status(200).json(successMessage);
+      } catch (error: unknown) {
         console.error("Error updating test case status:", error);
-        res.status(500).json({ error: "Failed to update test case status" });
+
+        // Handle known error type for clearer debugging
+        if (error instanceof Error) {
+          return res.status(500).json({ error: error.message });
+        }
+
+        // Handle any unknown error type
+        return res.status(500).json({
+          error: "Unknown error occurred while updating test case status",
+        });
       }
     });
 
     // Get test case by ID
     app.post("/readTestCaseByID", async (req: any, res: any) => {
       console.log("Received request body:", req.body);
-      // Check if ID is present in the request body
+
+      // Check if 'id' is present in the request body
       if (!req.body.id) {
         return res.status(400).json({ error: "Missing required field: id" });
       }
+
       const testCaseID = req.body.id;
+
       try {
+        // Call the function to read the test case by ID
         const result = await readTestCaseByID(contract, testCaseID);
-        const successMessage = { status: "success", message: result };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
+
+        // If no result found, handle it gracefully
+        if (!result) {
+          return res.status(404).json({
+            error: `Test case with ID ${testCaseID} not found.`,
+          });
+        }
+
+        // Return success response with the retrieved test case data
+        res.status(200).json({
+          status: "success",
+          message: "Test case retrieved successfully",
+          data: result, // Include the retrieved test case data in the response
+        });
+      } catch (error: unknown) {
         console.error("Error reading test case by ID:", error);
-        res.status(500).json({ error: "Failed to retrieve test case" });
+
+        // Handle known error type for clearer debugging
+        if (error instanceof Error) {
+          return res.status(500).json({ error: error.message });
+        }
+
+        // Handle any unknown error type
+        return res
+          .status(500)
+          .json({ error: "Unknown error occurred while retrieving test case" });
       }
     });
 
     // Delete a test case
     app.delete("/deleteTestCase", async (req: any, res: any) => {
       console.log("Received request body:", req.body);
-      // Check if ID is present in the request body
+
+      // Check if the required 'id' field is present in the request body
       if (!req.body.id) {
         return res.status(400).json({ error: "Missing required field: id" });
       }
-      // const testCaseID = req.body.id;
+
       try {
+        // Call the deleteTestCase function to delete the test case
         await deleteTestCase(contract, req.body.id);
+
+        // Return success message upon successful deletion
         const successMessage = {
           status: "success",
           message: "Test case deleted successfully",
         };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
+        res.status(200).json(successMessage); // Send response with a 200 OK status
+      } catch (error: unknown) {
         console.error("Error deleting test case:", error);
-        res.status(500).json({ error: "Failed to delete test case" });
+
+        // Handle different types of errors gracefully
+        if (error instanceof Error) {
+          res.status(500).json({ error: error.message }); // Return specific error message
+        } else {
+          res.status(500).json({ error: "Unknown error occurred" }); // Generic error message for unknown errors
+        }
       }
     });
 
@@ -408,7 +664,25 @@ async function main(): Promise<void> {
     app.post("/createTestPlan", async (req: any, res: any) => {
       console.log("Create Test Plan:");
       console.log(req.body);
+
+      // Validate required fields in the request body
+      if (
+        !req.body.tpID ||
+        !req.body.tpName ||
+        !req.body.tpDesc ||
+        !req.body.createdBy ||
+        !req.body.dateCreated ||
+        !req.body.assignedTestSuiteIDs ||
+        !req.body.assignedBuildID
+      ) {
+        return res.status(400).json({
+          error:
+            "Missing required fields: tpID, tpName, tpDesc, createdBy, dateCreated, assignedTestSuiteIDs, assignedBuildID",
+        });
+      }
+
       try {
+        // Call the createTestPlan function with the provided parameters
         await createTestPlan(
           contract,
           req.body.tpID,
@@ -421,14 +695,23 @@ async function main(): Promise<void> {
           req.body.assignedTestSuiteIDs,
           req.body.assignedBuildID
         );
+
         const successMessage = {
           status: "success",
-          message: "*** Transaction createAsset committed successfully",
+          message: "*** Transaction createTestPlan committed successfully",
         };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
+
+        // Return success message with 201 Created status
+        res.status(201).json(successMessage);
+      } catch (error: unknown) {
         console.error(`Failed to create test plan: ${error}`);
-        res.status(500).json({ error: error });
+
+        // Return appropriate error response
+        if (error instanceof Error) {
+          res.status(500).json({ error: error.message }); // If error is an instance of Error, return the message
+        } else {
+          res.status(500).json({ error: "Unknown error occurred" }); // For other unexpected errors
+        }
       }
     });
 
@@ -436,7 +719,16 @@ async function main(): Promise<void> {
     app.post("/createTestSuite", async (req: any, res: any) => {
       console.log("Create Test Suite:");
       console.log(req.body);
+
+      // Validate if the required fields are provided in the request body
+      if (!req.body.tsID || !req.body.tsName || !req.body.tsDesc) {
+        return res.status(400).json({
+          error: "Missing required fields: tsID, tsName, tsDesc",
+        });
+      }
+
       try {
+        // Call the createTestSuite function with the provided parameters
         await createTestSuite(
           contract,
           req.body.tsID,
@@ -445,14 +737,23 @@ async function main(): Promise<void> {
           req.body.cb,
           req.body.dc
         );
+
         const successMessage = {
           status: "success",
-          message: "*** Transaction createAsset committed successfully",
+          message: "*** Transaction createTestSuite committed successfully",
         };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
+
+        // Return success message with 201 Created status
+        res.status(201).json(successMessage);
+      } catch (error: unknown) {
         console.error(`Failed to create test suite: ${error}`);
-        res.status(500).json({ error: error });
+
+        // Return appropriate error response
+        if (error instanceof Error) {
+          res.status(500).json({ error: error.message }); // If error is an instance of Error, return the message
+        } else {
+          res.status(500).json({ error: "Unknown error occurred" }); // For other unexpected errors
+        }
       }
     });
 
@@ -460,7 +761,21 @@ async function main(): Promise<void> {
     app.post("/createBuild", async (req: any, res: any) => {
       console.log("Create Build:");
       console.log(req.body);
+
+      // Validate if the required fields are provided in the request body
+      if (
+        !req.body.bId ||
+        !req.body.bTitle ||
+        !req.body.bDesc ||
+        !req.body.bReleaseDate
+      ) {
+        return res.status(400).json({
+          error: "Missing required fields: bId, bTitle, bDesc, bReleaseDate",
+        });
+      }
+
       try {
+        // Call the createBuild function with the provided parameters
         await createBuild(
           contract,
           req.body.bId,
@@ -471,14 +786,23 @@ async function main(): Promise<void> {
           req.body.bReleaseDate,
           req.body.bVersion
         );
+
         const successMessage = {
           status: "success",
           message: "*** Transaction createBuild committed successfully",
         };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
+
+        // Return success message
+        res.status(201).json(successMessage); // 201 Created status as a successful creation
+      } catch (error: unknown) {
         console.error(`Failed to create build: ${error}`);
-        res.status(500).json({ error: error });
+
+        // Return a proper error message
+        if (error instanceof Error) {
+          res.status(500).json({ error: error.message }); // If error is an instance of Error, return the message
+        } else {
+          res.status(500).json({ error: "Unknown error occurred" }); // For other unexpected errors
+        }
       }
     });
 
@@ -492,127 +816,206 @@ async function main(): Promise<void> {
 
         // Handle the case where there is no test plan ID or if the result is invalid
         if (!latestIDString || latestIDString === "No test plans found") {
-          return res.status(404).json({
-            error: "No test plans found or ID could not be determined",
-          });
+          return res
+            .status(404) // Not Found if no test plans are found
+            .json({
+              error: "No test plans found or ID could not be determined",
+            });
         }
 
         // Return the latest test plan ID as a JSON response
-        return res.json({ latestTestPlanID: latestIDString.toString() });
-      } catch (error) {
+        return res.status(200).json({ latestTestPlanID: latestIDString });
+      } catch (error: unknown) {
         console.error("Error fetching latest test plan ID:", error);
-        res.status(500).json({ error: error });
+
+        // Handle error based on the type of error
+        if (error instanceof Error) {
+          res.status(500).json({ error: error.message }); // Return error message from caught Error
+        } else {
+          res.status(500).json({ error: "Unknown error occurred" }); // Handle unexpected error types
+        }
       }
     });
 
     //getLatestTestSuiteID
     app.get("/getLatestTestSuiteID", async (req: any, res: any) => {
       try {
-        // Call the GetLatestTestPlanID method in your chaincode
+        // Call the GetLatestTestSuiteID method in your chaincode
         const latestID = await GetLatestTestSuiteID(contract); // Replace 'contract' with your actual contract object
 
         // Ensure the result is a string (it could be a Buffer, so we convert it to a string)
         const latestIDString = latestID.toString().trim(); // Use .trim() to remove any extra spaces or newline chars
 
-        // Handle the case where there is no test plan ID or if the result is invalid
-        if (!latestIDString || latestIDString === "No test plans found") {
-          return res.status(404).json({
-            error: "No test suites found or ID could not be determined",
-          });
+        // Handle the case where there is no test suite ID or if the result is invalid
+        if (!latestIDString || latestIDString === "No test suites found") {
+          return res
+            .status(404) // Not Found if no test suite is found
+            .json({
+              error: "No test suites found or ID could not be determined",
+            });
         }
 
-        // Return the latest test plan ID as a JSON response
-        return res.json({ latestTestSuiteID: latestIDString.toString() });
-      } catch (error) {
-        console.error("Error fetching latest test plan ID:", error);
-        res.status(500).json({ error: error });
+        // Return the latest test suite ID as a JSON response
+        return res.status(200).json({ latestTestSuiteID: latestIDString });
+      } catch (error: unknown) {
+        console.error("Error fetching latest test suite ID:", error);
+
+        // Handle error based on the type of error
+        if (error instanceof Error) {
+          res.status(500).json({ error: error.message }); // Return error message from caught Error
+        } else {
+          res.status(500).json({ error: "Unknown error occurred" }); // Handle unexpected error types
+        }
       }
     });
 
     //getLatestBuildID
     app.get("/getLatestBuildID", async (req: any, res: any) => {
       try {
-        // Call the GetLatestTestPlanID method in your chaincode
+        // Call the GetLatestBuildID method in your chaincode
         const latestID = await GetLatestBuildID(contract); // Replace 'contract' with your actual contract object
 
         // Ensure the result is a string (it could be a Buffer, so we convert it to a string)
         const latestIDString = latestID.toString().trim(); // Use .trim() to remove any extra spaces or newline chars
 
-        // Handle the case where there is no test plan ID or if the result is invalid
+        // Handle the case where there is no build ID or if the result is invalid
         if (!latestIDString || latestIDString === "No builds found") {
           return res
-            .status(404)
+            .status(404) // Not Found if no build is found
             .json({ error: "No builds found or ID could not be determined" });
         }
 
-        // Return the latest test plan ID as a JSON response
-        return res.json({ latestBuildID: latestIDString.toString() });
-      } catch (error) {
+        // Return the latest build ID as a JSON response
+        return res.status(200).json({ latestBuildID: latestIDString });
+      } catch (error: unknown) {
         console.error("Error fetching latest build ID:", error);
-        res.status(500).json({ error: error });
+
+        // Handle error based on the type of error
+        if (error instanceof Error) {
+          res.status(500).json({ error: error.message }); // Return error message from caught Error
+        } else {
+          res.status(500).json({ error: "Unknown error occurred" }); // Handle unexpected error types
+        }
       }
     });
 
     //delete test plan
     app.delete("/deleteTestPlan", async (req: any, res: any) => {
       console.log("Received request body:", req.body);
+
       // Check if ID is present in the request body
       if (!req.body.tpID) {
-        return res.status(400).json({ error: "Missing required field: id" });
+        return res.status(400).json({ error: "Missing required field: tpID" });
       }
-      // const testCaseID = req.body.id;
+
       try {
+        // Attempt to delete the test plan using the provided tpID
         await deleteTestPlan(contract, req.body.tpID);
+
+        // Send a success response upon successful deletion
         const successMessage = {
           status: "success",
           message: "Test Plan deleted successfully",
         };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
+        res.status(200).send(JSON.stringify(successMessage)); // Use 200 OK on successful deletion
+      } catch (error: unknown) {
         console.error("Error deleting test plan:", error);
-        res.status(500).json({ error: "Failed to delete test plan" });
+
+        // Handle specific errors
+        if (error instanceof Error) {
+          if (error.message.includes("does not exist")) {
+            // If test plan does not exist, return 404 Not Found
+            res.status(404).json({
+              error: `Test Plan with ID ${req.body.tpID} does not exist.`,
+            });
+          } else {
+            // For general errors, return 500 Internal Server Error
+            res.status(500).json({ error: "Failed to delete test plan" });
+          }
+        } else {
+          // If an unknown error occurs
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
     //delete test suite
     app.delete("/deleteTestSuite", async (req: any, res: any) => {
       console.log("Received request body:", req.body);
+
       // Check if ID is present in the request body
       if (!req.body.tsID) {
-        return res.status(400).json({ error: "Missing required field: id" });
+        return res.status(400).json({ error: "Missing required field: tsID" });
       }
-      // const testCaseID = req.body.id;
+
       try {
+        // Attempt to delete the test suite using the provided tsID
         await deleteTestSuite(contract, req.body.tsID);
+
+        // Send a success response upon successful deletion
         const successMessage = {
           status: "success",
           message: "Test Suite deleted successfully",
         };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
+        res.status(200).send(JSON.stringify(successMessage)); // Use 200 OK on successful deletion
+      } catch (error: unknown) {
         console.error("Error deleting test suite:", error);
-        res.status(500).json({ error: "Failed to delete test suite" });
+
+        // Handle specific errors
+        if (error instanceof Error) {
+          if (error.message.includes("does not exist")) {
+            // If test suite does not exist, return 404 Not Found
+            res.status(404).json({
+              error: `Test Suite with ID ${req.body.tsID} does not exist.`,
+            });
+          } else {
+            // For general errors, return 500 Internal Server Error
+            res.status(500).json({ error: "Failed to delete test suite" });
+          }
+        } else {
+          // If an unknown error occurs
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
     //delete build
     app.delete("/deleteBuild", async (req: any, res: any) => {
       console.log("Received request body:", req.body);
+
       // Check if ID is present in the request body
       if (!req.body.bId) {
         return res.status(400).json({ error: "Missing required field: id" });
       }
-      // const testCaseID = req.body.id;
+
       try {
+        // Attempt to delete the build using the provided bId
         await deleteBuild(contract, req.body.bId);
+
+        // Send a success response upon successful deletion
         const successMessage = {
           status: "success",
           message: "Build deleted successfully",
         };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
+        res.status(200).send(JSON.stringify(successMessage)); // Use 200 OK on successful deletion
+      } catch (error: unknown) {
         console.error("Error deleting build:", error);
-        res.status(500).json({ error: "Failed to delete build" });
+
+        // Handle specific errors
+        if (error instanceof Error) {
+          if (error.message.includes("does not exist")) {
+            // If build does not exist, return 404 Not Found
+            res
+              .status(404)
+              .json({ error: `Build with ID ${req.body.bId} does not exist.` });
+          } else {
+            // For general errors, return 500 Internal Server Error
+            res.status(500).json({ error: "Failed to delete build" });
+          }
+        } else {
+          // If an unknown error occurs
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
@@ -620,23 +1023,31 @@ async function main(): Promise<void> {
       try {
         const testPlanID = req.params.id;
 
+        // Check if testPlanID is present
         if (!testPlanID) {
           return res
             .status(400)
             .json({ error: "Missing required path parameter: id" });
         }
 
+        // Fetch the test plan details using the provided testPlanID
         const testPlanDetails = await GetTestPlanById(contract, testPlanID);
-        res.status(200).json(testPlanDetails);
-      } catch (error) {
-        console.error("Error fetching test plan:", error);
+        res.status(200).json(testPlanDetails); // Return the test plan details with 200 OK status
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error("Error fetching test plan:", error);
 
-        if (error.includes("does not exist")) {
-          res.status(404).json({
-            error: "Test Plan with ID ${req.params.id} does not exist. ",
-          });
+          // If the error message contains 'does not exist', return a 404 status
+          if (error.message.includes("does not exist")) {
+            res.status(404).json({
+              error: `Test Plan with ID ${req.params.id} does not exist.`,
+            });
+          } else {
+            res.status(500).json({ error: "Failed to retrieve test plan." });
+          }
         } else {
-          res.status(500).json({ error: "Failed to retrieve test plan." });
+          console.error("Unknown error fetching test plan");
+          res.status(500).json({ error: "Unknown error occurred" });
         }
       }
     });
@@ -646,23 +1057,32 @@ async function main(): Promise<void> {
       try {
         const testSuiteID = req.params.id;
 
+        // Check if testSuiteID is present
         if (!testSuiteID) {
-          return res
-            .status(400)
-            .json({ error: "Missing required path parameter: id" });
+          throw new HttpError("Missing required path parameter: id", 400);
         }
 
+        // Fetch the test suite details using the provided testSuiteID
         const testSuiteDetails = await GetTestSuiteByID(contract, testSuiteID);
-        res.status(200).json(testSuiteDetails);
-      } catch (error) {
-        console.error("Error fetching test suite:", error);
-
-        if (error.includes("does not exist")) {
-          res.status(404).json({
-            error: "Test Suite with ID ${req.params.id} does not exist. ",
-          });
+        res.status(200).json(testSuiteDetails); // Return the test suite details with 200 OK status
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to retrieve test suite: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          // If the error message contains 'does not exist', return a 404 status
+          if (error.message.includes("does not exist")) {
+            console.error(`Test Suite not found: ${error.message}`);
+            res.status(404).json({
+              error: `Test Suite with ID ${req.params.id} not found.`,
+            });
+          } else {
+            console.error(`Error fetching test suite: ${error.message}`);
+            res.status(500).json({ error: "Failed to retrieve test suite." });
+          }
         } else {
-          res.status(500).json({ error: "Failed to retrieve test suite." });
+          console.error("Unknown error fetching test suite");
+          res.status(500).json({ error: "Unknown error occurred" });
         }
       }
     });
@@ -672,21 +1092,32 @@ async function main(): Promise<void> {
       try {
         const buildID = req.params.id;
 
+        // Check if buildID is present
         if (!buildID) {
-          return res
-            .status(400)
-            .json({ error: "Missing required path parameter: id" });
+          throw new HttpError("Missing required path parameter: id", 400);
         }
 
+        // Fetch the build details using the provided buildID
         const buildDetails = await GetBuildByID(contract, buildID);
-        res.status(200).json(buildDetails);
-      } catch (error) {
-        console.error("Error fetching build:", error);
-
-        if (error.includes("does not exist")) {
-          res.status(404).json({ error: error });
+        res.status(200).json(buildDetails); // Return the build details with 200 OK status
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to retrieve build: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          // If the error message contains 'does not exist', return a 404 status
+          if (error.message.includes("does not exist")) {
+            console.error(`Build not found: ${error.message}`);
+            res
+              .status(404)
+              .json({ error: `Build with ID ${req.params.id} not found.` });
+          } else {
+            console.error(`Error fetching build: ${error.message}`);
+            res.status(500).json({ error: "Failed to retrieve build." });
+          }
         } else {
-          res.status(500).json({ error: "Failed to retrieve build." });
+          console.error("Unknown error fetching build");
+          res.status(500).json({ error: "Unknown error occurred" });
         }
       }
     });
@@ -695,14 +1126,16 @@ async function main(): Promise<void> {
     app.post("/updateTestPlan", async (req: any, res: any) => {
       console.log("Received request body:", req.body);
 
-      // Check if required fields (id) are present
+      // Check if required fields (tpID) are present
       if (!req.body.tpID) {
-        return res.status(400).json({ error: "Missing required field: id" });
+        throw new HttpError("Missing required field: tpID", 400);
       }
+
       console.log("Update Test Plan:");
       console.log(req.body);
 
       try {
+        // Call the function to update the test plan
         await UpdateTestPlan(
           contract,
           req.body.tpID,
@@ -717,14 +1150,24 @@ async function main(): Promise<void> {
           req.body.assignedTestSuiteIDs,
           req.body.assignedBuildID
         );
+
         const successMessage = {
           status: "success",
           message: "Test plan updated successfully",
         };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
-        console.error("Error updating test plan:", error);
-        res.status(500).json({ error: error });
+
+        res.status(200).json(successMessage); // Send success message with 200 status code
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to update test plan: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Error updating test plan: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Unknown error updating test plan");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
@@ -732,14 +1175,16 @@ async function main(): Promise<void> {
     app.post("/updateTestSuite", async (req: any, res: any) => {
       console.log("Received request body:", req.body);
 
-      // Check if required fields (id) are present
+      // Check if required fields (tsID) are present
       if (!req.body.tsID) {
-        return res.status(400).json({ error: "Missing required field: id" });
+        throw new HttpError("Missing required field: tsID", 400);
       }
+
       console.log("Update Test Suite:");
       console.log(req.body);
 
       try {
+        // Call the function to update the test suite
         await UpdateTestSuite(
           contract,
           req.body.tsID,
@@ -750,14 +1195,24 @@ async function main(): Promise<void> {
           req.body.cb,
           req.body.dc
         );
+
         const successMessage = {
           status: "success",
           message: "Test suite updated successfully",
         };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
-        console.error("Error updating test suite:", error);
-        res.status(500).json({ error: error });
+
+        res.status(200).json(successMessage); // Send success message with 200 status code
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to update test suite: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Error updating test suite: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Unknown error updating test suite");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
@@ -765,14 +1220,16 @@ async function main(): Promise<void> {
     app.post("/updateBuild", async (req: any, res: any) => {
       console.log("Received request body:", req.body);
 
-      // Check if required fields (id) are present
+      // Check if required fields (bId) are present
       if (!req.body.bId) {
-        return res.status(400).json({ error: "Missing required field: id" });
+        throw new HttpError("Missing required field: bId", 400);
       }
+
       console.log("Update Build:");
       console.log(req.body);
 
       try {
+        // Call the function to update the build
         await UpdateBuild(
           contract,
           req.body.bId,
@@ -783,25 +1240,49 @@ async function main(): Promise<void> {
           req.body.bReleaseDate,
           req.body.bVersion
         );
+
         const successMessage = {
           status: "success",
           message: "Build updated successfully",
         };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
-        console.error("Error updating build:", error);
-        res.status(500).json({ error: error });
+        res.status(200).json(successMessage); // Send success message with 200 status code
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to update build: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Error updating build: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Unknown error updating build");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
     // returns the ID associated with the invoking identity.
     app.get("/getClientID", async (req: any, res: any) => {
-      await getClientID(contract);
-      const successMessage = {
-        status: "success",
-        message: "*** Transaction getClientID committed successfully",
-      };
-      res.send(JSON.stringify(successMessage));
+      try {
+        await getClientID(contract);
+
+        const successMessage = {
+          status: "success",
+          message: "*** Transaction getClientID committed successfully",
+        };
+
+        res.status(200).json(successMessage); // Sending a success response with 200 status code
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to get client ID: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Failed to get client ID: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Failed to get client ID: Unknown error");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
+      }
     });
 
     app.get("/getTestPlansForTestSuite/:id", async (req: any, res: any) => {
@@ -809,28 +1290,31 @@ async function main(): Promise<void> {
         const testSuiteID = req.params.id;
 
         if (!testSuiteID) {
-          return res
-            .status(400)
-            .json({ error: "Missing required path parameter: id" });
+          throw new HttpError("Missing required path parameter: id", 400);
         }
 
-        // Call the chaincode function to get the TestPlans for the TestSuite
         const testPlanNames = await GetTestPlansForTestSuite(
           contract,
           testSuiteID
         );
 
-        // Return the TestPlan names as the response
         res.status(200).json(testPlanNames);
-      } catch (error) {
-        console.error("Error fetching test plans:", error);
-
-        if (error.includes("does not exist")) {
-          res.status(404).json({
-            error: `Test Suite with ID ${req.params.id} does not exist.`,
-          });
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to get test plans: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          // Optional: handle specific known error messages for not found cases
+          if (error.message.includes("does not exist")) {
+            console.error(`Test suite not found: ${error.message}`);
+            res.status(404).json({ error: error.message });
+          } else {
+            console.error(`Failed to get test plans: ${error.message}`);
+            res.status(500).json({ error: error.message });
+          }
         } else {
-          res.status(500).json({ error: error });
+          console.error("Failed to get test plans: Unknown error");
+          res.status(500).json({ error: "Unknown error occurred" });
         }
       }
     });
@@ -861,14 +1345,23 @@ async function main(): Promise<void> {
           req.body.description,
           req.body.isActive
         );
-        const successMessage = {
+        res.json({
           status: "success",
           message: "*** Transaction createRole committed successfully",
-        };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
-        console.error(`Failed to create role: ${error}`);
-        res.status(500).json({ error: error });
+        });
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to create role: ${error.message}`);
+          res
+            .status(error.statusCode)
+            .json({ status: error.statusCode, error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Failed to create role: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Failed to create role: Unknown error");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
@@ -878,10 +1371,23 @@ async function main(): Promise<void> {
       console.log(`Get Role: ${roleId}`);
       try {
         const result = await readRole(contract, roleId);
+
+        if (!result) {
+          throw new HttpError("Role not found", 404);
+        }
+
         res.send(result);
-      } catch (error) {
-        console.error(`Failed to get role: ${error}`);
-        res.status(404).json({ error: error });
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to get role: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Failed to get role: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Failed to get role: Unknown error");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
@@ -897,14 +1403,21 @@ async function main(): Promise<void> {
           req.body.description,
           req.body.isActive
         );
-        const successMessage = {
+        res.json({
           status: "success",
           message: "*** Transaction updateRole committed successfully",
-        };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
-        console.error(`Failed to update role: ${error}`);
-        res.status(500).json({ error: error });
+        });
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to update role: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Failed to update role: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Failed to update role: Unknown error");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
@@ -914,13 +1427,21 @@ async function main(): Promise<void> {
       console.log(`Delete Role: ${roleId}`);
       try {
         await deleteRole(contract, roleId);
-        res.send({
+        res.json({
           status: "success",
           message: `Role ${roleId} deleted successfully`,
         });
-      } catch (error) {
-        console.error(`Failed to delete role: ${error}`);
-        res.status(500).json({ error: error });
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to delete role: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Failed to delete role: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Failed to delete role: Unknown error");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
@@ -929,9 +1450,17 @@ async function main(): Promise<void> {
       try {
         const roles = await getAllRoles(contract);
         res.send(roles);
-      } catch (error) {
-        console.error(`Failed to get all roles: ${error}`);
-        res.status(500).json({ error: error });
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to get all roles: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Failed to get all roles: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Failed to get all roles: Unknown error");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
@@ -942,6 +1471,7 @@ async function main(): Promise<void> {
       console.log("Create User:");
       console.log(req.body);
       let contract = network.getContract("basic", "UserContract");
+
       try {
         await createUser(
           contract,
@@ -951,14 +1481,22 @@ async function main(): Promise<void> {
           req.body.password,
           req.body.roleId
         );
-        const successMessage = {
+
+        res.json({
           status: "success",
           message: "*** Transaction createUser committed successfully",
-        };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
-        console.error(`Failed to create user: ${error}`);
-        res.status(500).json({ error: error });
+        });
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to create user: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Failed to create user: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Failed to create user: Unknown error");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
@@ -966,13 +1504,27 @@ async function main(): Promise<void> {
     app.get("/getUser/:id", async (req: any, res: any) => {
       const userId = req.params.id;
       console.log(`Get User: ${userId}`);
+
       try {
-        const contract = network.getContract("basic", "UserContract");
-        const result = await readUser(contract, userId);
-        res.send(result);
-      } catch (error) {
-        console.error(`Failed to get user: ${error}`);
-        res.status(404).json({ error: error });
+        let contract = network.getContract("basic", "UserContract");
+        const user = await readUser(contract, userId);
+
+        if (!user) {
+          throw new HttpError("User not found", 404);
+        }
+
+        res.json(user); // Send parsed JSON directly
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to get user: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Failed to get user: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Failed to get user: Unknown error");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
@@ -980,8 +1532,9 @@ async function main(): Promise<void> {
     app.put("/updateUser", async (req: any, res: any) => {
       console.log("Update User:");
       console.log(req.body);
+
       try {
-        const contract = network.getContract("basic", "UserContract");
+        let contract = network.getContract("basic", "UserContract");
 
         await updateUser(
           contract,
@@ -992,14 +1545,22 @@ async function main(): Promise<void> {
           req.body.roleId,
           req.body.resetToken
         );
-        const successMessage = {
+
+        res.json({
           status: "success",
           message: "*** Transaction updateUser committed successfully",
-        };
-        res.send(JSON.stringify(successMessage));
-      } catch (error) {
-        console.error(`Failed to update user: ${error}`);
-        res.status(500).json({ error: error });
+        });
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to update user: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Failed to update user: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Failed to update user: Unknown error");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
@@ -1007,28 +1568,46 @@ async function main(): Promise<void> {
     app.delete("/deleteUser/:id", async (req: any, res: any) => {
       const userId = req.params.id;
       console.log(`Delete User: ${userId}`);
+
       try {
-        const contract = network.getContract("basic", "UserContract");
+        let contract = network.getContract("basic", "UserContract");
         await deleteUser(contract, userId);
-        res.send({
+
+        res.json({
           status: "success",
           message: `User ${userId} deleted successfully`,
         });
-      } catch (error) {
-        console.error(`Failed to delete user: ${error}`);
-        res.status(500).json({ error: error });
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to delete user: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Failed to delete user: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Failed to delete user: Unknown error");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
     // GET ALL USERS
     app.get("/getAllUsers", async (req: any, res: any) => {
       try {
-        const contract = network.getContract("basic", "UserContract");
+        let contract = network.getContract("basic", "UserContract");
         const users = await getAllUsers(contract);
         res.send(users);
-      } catch (error) {
-        console.error(`Failed to get all users: ${error}`);
-        res.status(500).json({ error: error });
+      } catch (error: unknown) {
+        if (error instanceof HttpError) {
+          console.error(`Failed to get all users: ${error.message}`);
+          res.status(error.statusCode).json({ error: error.message });
+        } else if (error instanceof Error) {
+          console.error(`Failed to get all users: ${error.message}`);
+          res.status(500).json({ error: error.message });
+        } else {
+          console.error("Failed to get all users: Unknown error");
+          res.status(500).json({ error: "Unknown error occurred" });
+        }
       }
     });
 
@@ -1930,7 +2509,16 @@ async function createRole(
 async function readRole(contract: Contract, roleId: string): Promise<any> {
   console.log("--> Evaluate Transaction: ReadRole");
   const result = await contract.evaluateTransaction("ReadRole", roleId);
-  return JSON.parse(result.toString());
+  const jsonString = Buffer.from(result).toString("utf8");
+  console.log("Decoded JSON string:", jsonString);
+
+  try {
+    return JSON.parse(jsonString);
+  } catch (err) {
+    throw new Error(
+      `Failed to parse JSON: ${err.message}\nRaw output: ${result}`
+    );
+  }
 }
 
 async function updateRole(
@@ -1994,8 +2582,21 @@ async function createUser(
 
 async function readUser(contract: Contract, userId: string): Promise<any> {
   console.log("--> Evaluate Transaction: ReadUser");
-  const result = await contract.evaluateTransaction("ReadUser", userId);
-  return JSON.parse(result.toString());
+  try {
+    const result = await contract.evaluateTransaction("ReadUser", userId);
+    const jsonString = Buffer.from(result).toString("utf8");
+    console.log("Decoded JSON string:", jsonString);
+
+    try {
+      return JSON.parse(jsonString);
+    } catch (err) {
+      throw new Error(
+        `Failed to parse JSON: ${err.message}\nRaw output: ${jsonString}`
+      );
+    }
+  } catch (error) {
+    throw new Error(`Chaincode error: ${error.message || error}`);
+  }
 }
 
 async function updateUser(
