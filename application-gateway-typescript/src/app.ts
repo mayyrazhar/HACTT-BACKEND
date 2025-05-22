@@ -203,7 +203,7 @@ async function main(): Promise<void> {
         res.status(500).json({
           status: "error",
           message: "Failed to retrieve test plans",
-          error: error.message,
+          error: error,
         });
       }
     });
@@ -238,7 +238,7 @@ async function main(): Promise<void> {
         res.status(500).json({
           status: "error",
           message: "Failed to retrieve test plans",
-          error: error.message,
+          error: error,
         });
       }
     });
@@ -273,7 +273,7 @@ async function main(): Promise<void> {
         res.status(500).json({
           status: "error",
           message: "Failed to retrieve builds",
-          error: error.message,
+          error: error,
         });
       }
     });
@@ -303,7 +303,7 @@ async function main(): Promise<void> {
         res.send(JSON.stringify(successMessage));
       } catch (error) {
         console.error("Error creating test case:", error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -337,7 +337,7 @@ async function main(): Promise<void> {
         res.send(JSON.stringify(successMessage));
       } catch (error) {
         console.error("Error updating test case:", error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -428,7 +428,7 @@ async function main(): Promise<void> {
         res.send(JSON.stringify(successMessage));
       } catch (error) {
         console.error(`Failed to create test plan: ${error}`);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -452,7 +452,7 @@ async function main(): Promise<void> {
         res.send(JSON.stringify(successMessage));
       } catch (error) {
         console.error(`Failed to create test suite: ${error}`);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -478,7 +478,7 @@ async function main(): Promise<void> {
         res.send(JSON.stringify(successMessage));
       } catch (error) {
         console.error(`Failed to create build: ${error}`);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -501,7 +501,7 @@ async function main(): Promise<void> {
         return res.json({ latestTestPlanID: latestIDString.toString() });
       } catch (error) {
         console.error("Error fetching latest test plan ID:", error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -525,7 +525,7 @@ async function main(): Promise<void> {
         return res.json({ latestTestSuiteID: latestIDString.toString() });
       } catch (error) {
         console.error("Error fetching latest test plan ID:", error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -549,7 +549,7 @@ async function main(): Promise<void> {
         return res.json({ latestBuildID: latestIDString.toString() });
       } catch (error) {
         console.error("Error fetching latest build ID:", error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -629,9 +629,9 @@ async function main(): Promise<void> {
         const testPlanDetails = await GetTestPlanById(contract, testPlanID);
         res.status(200).json(testPlanDetails);
       } catch (error) {
-        console.error("Error fetching test plan:", error.message);
+        console.error("Error fetching test plan:", error);
 
-        if (error.message.includes("does not exist")) {
+        if (error.includes("does not exist")) {
           res.status(404).json({
             error: "Test Plan with ID ${req.params.id} does not exist. ",
           });
@@ -655,9 +655,9 @@ async function main(): Promise<void> {
         const testSuiteDetails = await GetTestSuiteByID(contract, testSuiteID);
         res.status(200).json(testSuiteDetails);
       } catch (error) {
-        console.error("Error fetching test suite:", error.message);
+        console.error("Error fetching test suite:", error);
 
-        if (error.message.includes("does not exist")) {
+        if (error.includes("does not exist")) {
           res.status(404).json({
             error: "Test Suite with ID ${req.params.id} does not exist. ",
           });
@@ -681,10 +681,10 @@ async function main(): Promise<void> {
         const buildDetails = await GetBuildByID(contract, buildID);
         res.status(200).json(buildDetails);
       } catch (error) {
-        console.error("Error fetching build:", error.message);
+        console.error("Error fetching build:", error);
 
-        if (error.message.includes("does not exist")) {
-          res.status(404).json({ error: error.message });
+        if (error.includes("does not exist")) {
+          res.status(404).json({ error: error });
         } else {
           res.status(500).json({ error: "Failed to retrieve build." });
         }
@@ -724,7 +724,7 @@ async function main(): Promise<void> {
         res.send(JSON.stringify(successMessage));
       } catch (error) {
         console.error("Error updating test plan:", error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -757,7 +757,7 @@ async function main(): Promise<void> {
         res.send(JSON.stringify(successMessage));
       } catch (error) {
         console.error("Error updating test suite:", error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -790,7 +790,7 @@ async function main(): Promise<void> {
         res.send(JSON.stringify(successMessage));
       } catch (error) {
         console.error("Error updating build:", error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -823,14 +823,14 @@ async function main(): Promise<void> {
         // Return the TestPlan names as the response
         res.status(200).json(testPlanNames);
       } catch (error) {
-        console.error("Error fetching test plans:", error.message);
+        console.error("Error fetching test plans:", error);
 
-        if (error.message.includes("does not exist")) {
+        if (error.includes("does not exist")) {
           res.status(404).json({
             error: `Test Suite with ID ${req.params.id} does not exist.`,
           });
         } else {
-          res.status(500).json({ error: error.message });
+          res.status(500).json({ error: error });
         }
       }
     });
@@ -844,7 +844,7 @@ async function main(): Promise<void> {
                 res.status(200).json({ status: 'success' });
             } catch (error) {
                 console.error('Error assigning test case to test plan:', error);
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: error });
             }
         });*/
 
@@ -868,7 +868,7 @@ async function main(): Promise<void> {
         res.send(JSON.stringify(successMessage));
       } catch (error) {
         console.error(`Failed to create role: ${error}`);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -881,7 +881,7 @@ async function main(): Promise<void> {
         res.send(result);
       } catch (error) {
         console.error(`Failed to get role: ${error}`);
-        res.status(404).json({ error: error.message });
+        res.status(404).json({ error: error });
       }
     });
 
@@ -904,7 +904,7 @@ async function main(): Promise<void> {
         res.send(JSON.stringify(successMessage));
       } catch (error) {
         console.error(`Failed to update role: ${error}`);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -920,7 +920,7 @@ async function main(): Promise<void> {
         });
       } catch (error) {
         console.error(`Failed to delete role: ${error}`);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -931,7 +931,7 @@ async function main(): Promise<void> {
         res.send(roles);
       } catch (error) {
         console.error(`Failed to get all roles: ${error}`);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -942,7 +942,6 @@ async function main(): Promise<void> {
       console.log("Create User:");
       console.log(req.body);
       let contract = network.getContract("basic", "UserContract");
-      let contract = await getAllUsers(contract);
       try {
         await createUser(
           contract,
@@ -959,7 +958,7 @@ async function main(): Promise<void> {
         res.send(JSON.stringify(successMessage));
       } catch (error) {
         console.error(`Failed to create user: ${error}`);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error });
       }
     });
 
@@ -969,7 +968,6 @@ async function main(): Promise<void> {
       console.log(`Get User: ${userId}`);
       try {
         const contract = network.getContract("basic", "UserContract");
-
         const result = await readUser(contract, userId);
         res.send(result);
       } catch (error) {
@@ -1047,25 +1045,25 @@ async function main(): Promise<void> {
     // await createAsset(contract);
 
     // Get all test cases on the ledger.
-    await getAllTestCases(contract);
+    // await getAllTestCases(contract);
 
-    await getAllTestCasesWithHistory(contract);
+    // await getAllTestCasesWithHistory(contract);
 
-    await getAllTestPlans(contract);
+    // await getAllTestPlans(contract);
 
-    await getAllTestPlansWithHistory(contract);
+    // await getAllTestPlansWithHistory(contract);
 
-    await getAllTestSuites(contract);
+    // await getAllTestSuites(contract);
 
-    await getAllBuildsWithHistory(contract);
+    // await getAllBuildsWithHistory(contract);
 
-    await getAllBuilds(contract);
+    // await getAllBuilds(contract);
 
     //await GetTestPlanById(contract, testPlanID)
 
-    await GetLatestTestPlanID(contract);
-    await GetLatestTestSuiteID(contract);
-    await GetLatestBuildID(contract);
+    // await GetLatestTestPlanID(contract);
+    // await GetLatestTestSuiteID(contract);
+    // await GetLatestBuildID(contract);
     // Update an existing asset asynchronously.
     // await transferAssetAsync(contract);
 
@@ -1077,10 +1075,10 @@ async function main(): Promise<void> {
     // returns the ID associated with the invoking identity.
 
     // Role and User startup logs
-    await getAllRoles(contract);
-    await getAllUsers(contract);
+    // await getAllRoles(contract);
+    // await getAllUsers(contract);
 
-    await getClientID(contract);
+    // await getClientID(contract);
   } finally {
     // gateway.close();
     // client.close();
@@ -1298,7 +1296,7 @@ async function GetLatestTestPlanID(contract: Contract): Promise<string> {
     return resultJson;
   } catch (error) {
     console.error("Error fetching latest test plan ID:", error);
-    throw new Error(`Failed to fetch latest test plan ID: ${error.message}`);
+    throw new Error(`Failed to fetch latest test plan ID: ${error}`);
   }
 }
 
@@ -1330,7 +1328,7 @@ async function GetLatestTestSuiteID(contract: Contract): Promise<string> {
     return resultJson;
   } catch (error) {
     console.error("Error fetching latest test suite ID:", error);
-    throw new Error(`Failed to fetch latest test suite ID: ${error.message}`);
+    throw new Error(`Failed to fetch latest test suite ID: ${error}`);
   }
 }
 
@@ -1358,7 +1356,7 @@ async function GetLatestBuildID(contract: Contract): Promise<string> {
     return resultJson;
   } catch (error) {
     console.error("Error fetching latest build ID:", error);
-    throw new Error(`Failed to fetch latest build ID: ${error.message}`);
+    throw new Error(`Failed to fetch latest build ID: ${error}`);
   }
 }
 
@@ -1386,7 +1384,7 @@ async function GetTestPlanById(
   } catch (error) {
     console.error("Error fetching Test Plan with ID ${testPlanID}:", error);
     throw new Error(
-      `Failed to fetch Test Plan with ID ${testPlanID}. Error: ${error.message}`
+      `Failed to fetch Test Plan with ID ${testPlanID}. Error: ${error}`
     );
   }
 }
@@ -1412,7 +1410,7 @@ async function GetBuildByID(contract: Contract, buildID: string): Promise<any> {
   } catch (error) {
     console.error("Error fetching Build with ID ${buildID}:", error);
     throw new Error(
-      `Failed to fetch Build with ID ${buildID}. Error: ${error.message}`
+      `Failed to fetch Build with ID ${buildID}. Error: ${error}`
     );
   }
 }
@@ -1455,7 +1453,7 @@ async function GetTestSuiteByID(
   } catch (error) {
     console.error("Error fetching Test Suite with ID ${testSuiteID}:", error);
     throw new Error(
-      `Failed to fetch Test Suite with ID ${testSuiteID}. Error: ${error.message}`
+      `Failed to fetch Test Suite with ID ${testSuiteID}. Error: ${error}`
     );
   }
 }
@@ -1904,7 +1902,7 @@ async function GetTestPlansForTestSuite(
   } catch (error) {
     console.error(`Error fetching Test Plans for TestSuiteID ${tsID}:`, error);
     throw new Error(
-      `Failed to fetch Test Plans for TestSuiteID ${tsID}. Error: ${error.message}`
+      `Failed to fetch Test Plans for TestSuiteID ${tsID}. Error: ${error}`
     );
   }
 }
