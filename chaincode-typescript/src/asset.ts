@@ -51,7 +51,7 @@ export class Asset {
   public testSuiteDesc: string;
 
   @Property()
-  pblic testSuiteStatus: string;
+  public testSuiteStatus: string;
 
   @Property()
   public importance: string;

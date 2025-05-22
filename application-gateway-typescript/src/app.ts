@@ -849,6 +849,11 @@ async function main(): Promise<void> {
         // Update an asset which does not exist.
         // await updateNonExistentAsset(contract)
         // returns the ID associated with the invoking identity.
+
+       // Role and User startup logs
+        await getAllRoles(contract);
+        await getAllUsers(contract);
+
         await getClientID(contract);
     } finally {
         // gateway.close();
@@ -1521,10 +1526,15 @@ async function deleteRole(contract: Contract, roleId: string): Promise<void> {
     console.log('*** Role deleted successfully');
 }
 
-async function getAllRoles(contract: Contract): Promise<any[]> {
-    console.log('--> Evaluate Transaction: GetAllRoles');
-    const result = await contract.evaluateTransaction('GetAllRoles');
-    return JSON.parse(result.toString());
+// Get All Roles
+async function getAllRoles(contract: Contract): Promise<any> {
+    console.log('\n--> Evaluate Transaction: GetAllRoles, function returns all roles on the ledger');
+
+    const resultBytes = await contract.evaluateTransaction('GetAllRoles');
+    const resultJson = utf8Decoder.decode(resultBytes);
+    const result = JSON.parse(resultJson);
+    console.log('*** Result:', result);
+    return result;
 }
 
 /************User Module Helper Functions ****************/
@@ -1553,9 +1563,14 @@ async function deleteUser(contract: Contract, userId: string): Promise<void> {
     console.log('*** User deleted successfully');
 }
 
-async function getAllUsers(contract: Contract): Promise<any[]> {
-    console.log('--> Evaluate Transaction: GetAllUsers');
-    const result = await contract.evaluateTransaction('GetAllUsers');
-    return JSON.parse(result.toString());
+// Get All Users
+async function getAllUsers(contract: Contract): Promise<any> {
+    console.log('\n--> Evaluate Transaction: GetAllUsers, function returns all users on the ledger');
+
+    const resultBytes = await contract.evaluateTransaction('GetAllUsers');
+    const resultJson = utf8Decoder.decode(resultBytes);
+    const result = JSON.parse(resultJson);
+    console.log('*** Result:', result);
+    return result;
 }
   
