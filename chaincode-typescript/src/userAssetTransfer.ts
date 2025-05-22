@@ -70,7 +70,7 @@ export class UserContract extends Contract {
 
     let result = await iterator.next();
     while (!result.done) {
-      const strValue = result.value.value.toString('utf8');
+      const strValue = result.value.value.toString();
       try {
         const record = JSON.parse(strValue);
         if (record.userId) results.push(record as UserAsset);
