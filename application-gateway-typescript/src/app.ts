@@ -7,19 +7,18 @@
 //Test Havi
 
 import * as grpc from "@grpc/grpc-js";
-import HttpError from "./utils/customError";
 import {
   connect,
   Contract,
   Identity,
   Signer,
-  signers,
-  StatusCode,
+  signers
 } from "@hyperledger/fabric-gateway";
 import * as crypto from "crypto";
 import { promises as fs } from "fs";
 import * as path from "path";
 import { TextDecoder } from "util";
+import HttpError from "./utils/customError";
 
 let channelName = envOrDefault("CHANNEL_NAME", "mychannel");
 let chaincodeName = envOrDefault("CHAINCODE_NAME", "basic");
@@ -1337,6 +1336,9 @@ async function main(): Promise<void> {
     app.post("/createRole", async (req: any, res: any) => {
       console.log("Create Role:");
       console.log(req.body);
+      if (!contract) {
+          return res.status(500).json({ error: "Contract not initialized" });
+      } 
       try {
         await createRole(
           contract,

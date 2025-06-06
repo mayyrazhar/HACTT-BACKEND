@@ -917,7 +917,7 @@ export class AssetTransferContract extends Contract {
             const strValue = result.value.value.toString('utf8');
             try {
                 const record = JSON.parse(strValue);
-                if (record.roleId) {
+                if (record.roleId && record.roleName) {
                     allResults.push(record as RoleAsset);
                 }
             } catch (err) {
