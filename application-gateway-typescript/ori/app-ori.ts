@@ -8,7 +8,6 @@ import * as grpc from '@grpc/grpc-js';
 import { connect, Contract, Identity, Signer, signers } from '@hyperledger/fabric-gateway';
 import * as crypto from 'crypto';
 import { promises as fs } from 'fs';
-import { tmpdir } from 'os';
 import * as path from 'path';
 import { TextDecoder } from 'util';
 
@@ -154,102 +153,102 @@ async function main(): Promise<void> {
             }
         });
 
-        // Create a new asset on the ledger.
-        app.post('/createTestCase', async (req: any, res: any) => {
-            console.log("Create Test Case:")
-            console.log(req.body);
+        // // Create a new asset on the ledger.
+        // app.post('/createTestCase', async (req: any, res: any) => {
+        //     console.log("Create Test Case:")
+        //     console.log(req.body);
 
-            try {
-                await createAsset(contract, req.body.id, req.body.tcdesc, req.body.dl, req.body.pid,
-                    req.body.tcn, req.body.dtc, req.body.usrn, req.body.ostts, req.body.tpID);
-                const successMessage = { status: 'success', message: '*** Transaction createAsset committed successfully' };
-                res.send(JSON.stringify(successMessage));
-            } catch (error) {
-                console.error('Error creating test case:', error);
-                res.status(500).json({ error: error.message });
-            }
+        //     try {
+        //         await createAsset(contract, req.body.id, req.body.tcdesc, req.body.dl, req.body.pid,
+        //             req.body.tcn, req.body.dtc, req.body.usrn, req.body.ostts, req.body.tpID);
+        //         const successMessage = { status: 'success', message: '*** Transaction createAsset committed successfully' };
+        //         res.send(JSON.stringify(successMessage));
+        //     } catch (error) {
+        //         console.error('Error creating test case:', error);
+        //         res.status(500).json({ error: error.message });
+        //     }
 
-        })
+        // })
 
-        // Update a test case
-        app.post('/updateTestCase', async (req: any, res: any) => {
-            console.log('Received request body:', req.body);
+        // // Update a test case
+        // app.post('/updateTestCase', async (req: any, res: any) => {
+        //     console.log('Received request body:', req.body);
 
-            // Check if required fields (id) are present
-            if (!req.body.id) {
-                return res.status(400).json({ error: 'Missing required field: id' });
-            }
-            console.log("Update Test Case:")
-            console.log(req.body);
+        //     // Check if required fields (id) are present
+        //     if (!req.body.id) {
+        //         return res.status(400).json({ error: 'Missing required field: id' });
+        //     }
+        //     console.log("Update Test Case:")
+        //     console.log(req.body);
 
-            try {
-                await UpdateAsset(contract, req.body.id, req.body.tcdesc, req.body.dl, req.body.pid,
-                    req.body.tcn, req.body.dtc, req.body.usrn, req.body.ostts);
-                const successMessage = { status: 'success', message: 'Test case updated successfully' };
-                res.send(JSON.stringify(successMessage));
-            } catch (error) {
-                console.error('Error updating test case:', error);
-                res.status(500).json({ error: error.message });
-            }
-        });
+        //     try {
+        //         await UpdateAsset(contract, req.body.id, req.body.tcdesc, req.body.dl, req.body.pid,
+        //             req.body.tcn, req.body.dtc, req.body.usrn, req.body.ostts);
+        //         const successMessage = { status: 'success', message: 'Test case updated successfully' };
+        //         res.send(JSON.stringify(successMessage));
+        //     } catch (error) {
+        //         console.error('Error updating test case:', error);
+        //         res.status(500).json({ error: error.message });
+        //     }
+        // });
 
-        // Update overall status of a test case
-        app.post('/updateTestCaseStatus', async (req: any, res: any) => {
-            console.log('Received request body:', req.body);
+        // // Update overall status of a test case
+        // app.post('/updateTestCaseStatus', async (req: any, res: any) => {
+        //     console.log('Received request body:', req.body);
 
-            // Check if required fields (id) are present
-            if (!req.body.id) {
-                return res.status(400).json({ error: 'Missing required field: id' });
-            }
-            console.log("Update Test Case Status:")
-            console.log(req.body);
+        //     // Check if required fields (id) are present
+        //     if (!req.body.id) {
+        //         return res.status(400).json({ error: 'Missing required field: id' });
+        //     }
+        //     console.log("Update Test Case Status:")
+        //     console.log(req.body);
 
-            try {
-                await UpdateTestCaseStatus(contract, req.body.id, req.body.ostts);
-                const successMessage = { status: 'success', message: 'Test case status updated successfully' };
-                res.send(JSON.stringify(successMessage));
-            } catch (error) {
-                console.error('Error updating test case status:', error);
-                res.status(500).json({ error: 'Failed to update test case status' });
-            }
-        });
+        //     try {
+        //         await UpdateTestCaseStatus(contract, req.body.id, req.body.ostts);
+        //         const successMessage = { status: 'success', message: 'Test case status updated successfully' };
+        //         res.send(JSON.stringify(successMessage));
+        //     } catch (error) {
+        //         console.error('Error updating test case status:', error);
+        //         res.status(500).json({ error: 'Failed to update test case status' });
+        //     }
+        // });
 
-        // Get test case by ID
-        app.post('/readTestCaseByID', async (req: any, res: any) => {
-            console.log('Received request body:', req.body);
-            // Check if ID is present in the request body
-            if (!req.body.id) {
-                return res.status(400).json({ error: 'Missing required field: id' });
-            }
-            const testCaseID = req.body.id;
-            try {
-                const result = await readTestCaseByID(contract, testCaseID);
-                const successMessage = { status: 'success', message: result };
-                res.send(JSON.stringify(successMessage));
-            } catch (error) {
-                console.error('Error reading test case by ID:', error);
-                res.status(500).json({ error: 'Failed to retrieve test case' });
-            }
+        // // Get test case by ID
+        // app.post('/readTestCaseByID', async (req: any, res: any) => {
+        //     console.log('Received request body:', req.body);
+        //     // Check if ID is present in the request body
+        //     if (!req.body.id) {
+        //         return res.status(400).json({ error: 'Missing required field: id' });
+        //     }
+        //     const testCaseID = req.body.id;
+        //     try {
+        //         const result = await readTestCaseByID(contract, testCaseID);
+        //         const successMessage = { status: 'success', message: result };
+        //         res.send(JSON.stringify(successMessage));
+        //     } catch (error) {
+        //         console.error('Error reading test case by ID:', error);
+        //         res.status(500).json({ error: 'Failed to retrieve test case' });
+        //     }
 
-        })
+        // })
 
-        // Delete a test case
-        app.delete('/deleteTestCase', async (req: any, res: any) => {
-            console.log('Received request body:', req.body);
-            // Check if ID is present in the request body
-            if (!req.body.id) {
-                return res.status(400).json({ error: 'Missing required field: id' });
-            }
-            // const testCaseID = req.body.id;
-            try {
-                await deleteTestCase(contract, req.body.id);
-                const successMessage = { status: 'success', message: 'Test case deleted successfully' };
-                res.send(JSON.stringify(successMessage));
-            } catch (error) {
-                console.error('Error deleting test case:', error);
-                res.status(500).json({ error: 'Failed to delete test case' });
-            }
-        })
+        // // Delete a test case
+        // app.delete('/deleteTestCase', async (req: any, res: any) => {
+        //     console.log('Received request body:', req.body);
+        //     // Check if ID is present in the request body
+        //     if (!req.body.id) {
+        //         return res.status(400).json({ error: 'Missing required field: id' });
+        //     }
+        //     // const testCaseID = req.body.id;
+        //     try {
+        //         await deleteTestCase(contract, req.body.id);
+        //         const successMessage = { status: 'success', message: 'Test case deleted successfully' };
+        //         res.send(JSON.stringify(successMessage));
+        //     } catch (error) {
+        //         console.error('Error deleting test case:', error);
+        //         res.status(500).json({ error: 'Failed to delete test case' });
+        //     }
+        // })
 
         //create test plan
         app.post('/createTestPlan', async (req: any, res: any) => {

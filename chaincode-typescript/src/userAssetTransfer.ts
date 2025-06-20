@@ -97,7 +97,9 @@ export class UserContract extends Contract {
       const strValue = result.value.value.toString();
       try {
         const record = JSON.parse(strValue);
-        if (record.userId) results.push(record as UserAsset);
+        if (record.userId && record.password) {
+          results.push(record as UserAsset);
+        }
       } catch (e) {
         console.error("Error parsing user:", e);
       }

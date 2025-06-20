@@ -172,3 +172,58 @@ export class UserAsset {
   public resetToken: string;
 }
 
+// Test Case Asset class
+@Object()
+export class TestCaseAsset {
+  @Property()
+  public idtest_cases: string;
+
+  @Property()
+  public test_desc: string;
+
+  @Property()
+  public deadline: string;
+
+  @Property()
+  public dateUpdated: string;
+
+  @Property()
+  public projectId: string;
+
+  @Property()
+  public reason: string;
+
+  @Property()
+  public testCaseName: string;
+
+  @Property()
+  public dateCreated: string;
+
+  @Property()
+  public userID: string; // Store JSON.stringify([2001, 2002])
+
+  @Property()
+  public userStatuses: string; // Store JSON.stringify({ "Teenesh": "Approved" })
+
+  @Property()
+  public overallStatus: string;
+
+  @Property()
+  public username: string;
+
+  @Property()
+  public createdBy: string;
+
+  @Property()
+  public status: string;
+
+  @Property()
+  public userReasons: string; // Store JSON.stringify({ "Teenesh": "Needs more detail" })
+
+  @Property()
+  public tcSteps: string; // Store JSON.stringify(["Step 1", "Step 2"])
+
+  @Property()
+  public expectedResults: string; // Store JSON.stringify(["Expected A", "Expected B"])
+}
+

@@ -169,73 +169,323 @@ async function main(): Promise<void> {
     //     res.send(JSON.stringify(successMessage));
     // })
 
-    app.get("/getAllTestCases", async (req: any, res: any) => {
-      try {
-        // Fetch all test cases from the contract
-        const allResults = await getAllTestCases(contract);
+    // app.get("/getAllTestCases", async (req: any, res: any) => {
+    //   try {
+    //     // Fetch all test cases from the contract
+    //     const allResults = await getAllTestCases(contract);
 
-        // Log the number of test cases retrieved
-        console.log(`Retrieved ${allResults.length} test cases`);
+    //     // Log the number of test cases retrieved
+    //     console.log(`Retrieved ${allResults.length} test cases`);
 
-        // Prepare a structured success message with the results
-        const successMessage = {
-          status: "success",
-          message: "Test cases retrieved successfully",
-          data: allResults, // Include the actual test cases in the response
-        };
+    //     // Prepare a structured success message with the results
+    //     const successMessage = {
+    //       status: "success",
+    //       message: "Test cases retrieved successfully",
+    //       data: allResults, // Include the actual test cases in the response
+    //     };
 
-        // Explicitly set the Content-Type header to application/json
-        res.setHeader("Content-Type", "application/json");
-        res.status(200).json(successMessage); // Send the success response
-      } catch (error) {
-        console.error("Error fetching test cases:", error);
+    //     // Explicitly set the Content-Type header to application/json
+    //     res.setHeader("Content-Type", "application/json");
+    //     res.status(200).json(successMessage); // Send the success response
+    //   } catch (error) {
+    //     console.error("Error fetching test cases:", error);
 
-        // Prepare the error message with detailed information
-        const errorMessage = {
-          status: "error",
-          message: "Failed to fetch test cases",
-          error: error instanceof Error ? error.message : "Unknown error", // Handle non-standard errors gracefully
-        };
+    //     // Prepare the error message with detailed information
+    //     const errorMessage = {
+    //       status: "error",
+    //       message: "Failed to fetch test cases",
+    //       error: error instanceof Error ? error.message : "Unknown error", // Handle non-standard errors gracefully
+    //     };
 
-        // Explicitly set the Content-Type header to application/json
-        res.setHeader("Content-Type", "application/json");
-        res.status(500).json(errorMessage); // Send the error response
-      }
-    });
+    //     // Explicitly set the Content-Type header to application/json
+    //     res.setHeader("Content-Type", "application/json");
+    //     res.status(500).json(errorMessage); // Send the error response
+    //   }
+    // });
 
-    app.get("/getAllTestCasesWithHistory", async (req: any, res: any) => {
-      try {
-        // Fetch all test cases with history from the contract
-        const allResults = await getAllTestCasesWithHistory(contract);
+    // app.get("/getAllTestCasesWithHistory", async (req: any, res: any) => {
+    //   try {
+    //     // Fetch all test cases with history from the contract
+    //     const allResults = await getAllTestCasesWithHistory(contract);
 
-        // Log the number of test cases retrieved for debugging purposes
-        console.log(`Retrieved ${allResults.length} test cases with history`);
+    //     // Log the number of test cases retrieved for debugging purposes
+    //     console.log(`Retrieved ${allResults.length} test cases with history`);
 
-        // Prepare the success message with a structured response
-        const successMessage = {
-          status: "success",
-          message: "Test cases with history retrieved successfully",
-          data: allResults, // Include the actual data in the response
-        };
+    //     // Prepare the success message with a structured response
+    //     const successMessage = {
+    //       status: "success",
+    //       message: "Test cases with history retrieved successfully",
+    //       data: allResults, // Include the actual data in the response
+    //     };
 
-        // Explicitly set the Content-Type header to application/json
-        res.setHeader("Content-Type", "application/json");
-        res.status(200).json(successMessage); // Send the structured response
-      } catch (error) {
-        console.error("Error fetching test cases:", error);
+    //     // Explicitly set the Content-Type header to application/json
+    //     res.setHeader("Content-Type", "application/json");
+    //     res.status(200).json(successMessage); // Send the structured response
+    //   } catch (error) {
+    //     console.error("Error fetching test cases:", error);
 
-        // Prepare the error response with detailed error message
-        const errorMessage = {
-          status: "error",
-          message: "Failed to fetch test cases",
-          error: error instanceof Error ? error.message : "Unknown error", // Handle non-standard errors gracefully
-        };
+    //     // Prepare the error response with detailed error message
+    //     const errorMessage = {
+    //       status: "error",
+    //       message: "Failed to fetch test cases",
+    //       error: error instanceof Error ? error.message : "Unknown error", // Handle non-standard errors gracefully
+    //     };
 
-        // Explicitly set the Content-Type header to application/json
-        res.setHeader("Content-Type", "application/json");
-        res.status(500).json(errorMessage); // Send error response
-      }
-    });
+    //     // Explicitly set the Content-Type header to application/json
+    //     res.setHeader("Content-Type", "application/json");
+    //     res.status(500).json(errorMessage); // Send error response
+    //   }
+    // });
+
+    // // Create a new asset on the ledger.
+    // app.post("/createTestCase", async (req: any, res: any) => {
+    //   console.log("Received request body:", req.body);
+
+    //   // Validate required fields
+    //   const requiredFields = [
+    //     "id",
+    //     "tcdesc",
+    //     "dl",
+    //     "pid",
+    //     "tcn",
+    //     "dtc",
+    //     "usrn",
+    //     "ostts",
+    //     "tcSteps",
+    //   ];
+
+    //   for (let field of requiredFields) {
+    //     if (!req.body[field]) {
+    //       return res
+    //         .status(400)
+    //         .json({ error: `Missing required field: ${field}` });
+    //     }
+    //   }
+
+    //   const { id, tcdesc, dl, pid, tcn, dtc, usrn, ostts, tcSteps } = req.body;
+
+    //   console.log("Creating Test Case:");
+    //   console.log(`Test Case ID: ${id}`);
+    //   console.log(`Description: ${tcdesc}, DL: ${dl}, PID: ${pid}`);
+    //   console.log(`Test Case Number: ${tcn}, Date Created: ${dtc}`);
+    //   console.log(`Username: ${usrn}, Status: ${ostts}`);
+    //   console.log(`Test Case Steps: ${tcSteps.length} steps`);
+
+    //   try {
+    //     // Call the function to create the test case
+    //     await createAsset(
+    //       contract,
+    //       id,
+    //       tcdesc,
+    //       dl,
+    //       pid,
+    //       tcn,
+    //       dtc,
+    //       usrn,
+    //       ostts,
+    //       tcSteps
+    //     );
+
+    //     const successMessage = {
+    //       status: "success",
+    //       message: "*** Transaction createAsset committed successfully",
+    //     };
+
+    //     res.status(200).json(successMessage);
+    //   } catch (error) {
+    //     console.error("Error creating test case:", error);
+
+    //     // Return a detailed error message
+    //     if (error instanceof Error) {
+    //       return res.status(500).json({ error: error.message });
+    //     }
+
+    //     // Return a generic error if the error type is unknown
+    //     return res.status(500).json({
+    //       error: "An unexpected error occurred while creating the test case.",
+    //     });
+    //   }
+    // });
+
+    // // Update a test case
+    // app.post("/updateTestCase", async (req: any, res: any) => {
+    //   console.log("Received request body:", req.body);
+
+    //   // Check if the required fields are present in the request body
+    //   const requiredFields = [
+    //     "id",
+    //     "tcdesc",
+    //     "dl",
+    //     "pid",
+    //     "tcn",
+    //     "dtc",
+    //     "usrn",
+    //     "ostts",
+    //   ];
+
+    //   for (let field of requiredFields) {
+    //     if (!req.body[field]) {
+    //       return res
+    //         .status(400)
+    //         .json({ error: `Missing required field: ${field}` });
+    //     }
+    //   }
+
+    //   const { id, tcdesc, dl, pid, tcn, dtc, usrn, ostts } = req.body;
+
+    //   console.log("Update Test Case:");
+    //   console.log(`Test Case ID: ${id}`);
+    //   console.log(
+    //     `Description: ${tcdesc}, DL: ${dl}, PID: ${pid}, Test Case Number: ${tcn}`
+    //   );
+    //   console.log(`Date Created: ${dtc}, Username: ${usrn}, Status: ${ostts}`);
+
+    //   try {
+    //     // Call the function to update the test case
+    //     await UpdateAsset(contract, id, tcdesc, dl, pid, tcn, dtc, usrn, ostts);
+
+    //     const successMessage = {
+    //       status: "success",
+    //       message: "Test case updated successfully",
+    //     };
+
+    //     res.status(200).json(successMessage);
+    //   } catch (error) {
+    //     console.error("Error updating test case:", error);
+
+    //     // Handle known error type for clearer debugging
+    //     if (error instanceof Error) {
+    //       return res.status(500).json({ error: error.message });
+    //     }
+
+    //     // Handle any unknown error type
+    //     return res
+    //       .status(500)
+    //       .json({ error: "Unknown error occurred while updating test case" });
+    //   }
+    // });
+
+    // // Update overall status of a test case
+    // app.post("/updateTestCaseStatus", async (req: any, res: any) => {
+    //   console.log("Received request body:", req.body);
+
+    //   // Check if the required fields ('id' and 'ostts') are present
+    //   if (!req.body.id || !req.body.ostts) {
+    //     return res
+    //       .status(400)
+    //       .json({ error: "Missing required fields: id or ostts" });
+    //   }
+
+    //   const testCaseID = req.body.id;
+    //   const newStatus = req.body.ostts;
+
+    //   console.log("Update Test Case Status:");
+    //   console.log(`Test Case ID: ${testCaseID}, New Status: ${newStatus}`);
+
+    //   try {
+    //     // Call the function to update the test case status
+    //     const result = await UpdateTestCaseStatus(
+    //       contract,
+    //       testCaseID,
+    //       newStatus
+    //     );
+
+    //     // If the update is successful, return a success message
+    //     const successMessage = {
+    //       status: "success",
+    //       message: "Test case status updated successfully",
+    //     };
+
+    //     // Send back the success message
+    //     res.status(200).json(successMessage);
+    //   } catch (error: unknown) {
+    //     console.error("Error updating test case status:", error);
+
+    //     // Handle known error type for clearer debugging
+    //     if (error instanceof Error) {
+    //       return res.status(500).json({ error: error.message });
+    //     }
+
+    //     // Handle any unknown error type
+    //     return res.status(500).json({
+    //       error: "Unknown error occurred while updating test case status",
+    //     });
+    //   }
+    // });
+
+    // // Get test case by ID
+    // app.post("/readTestCaseByID", async (req: any, res: any) => {
+    //   console.log("Received request body:", req.body);
+
+    //   // Check if 'id' is present in the request body
+    //   if (!req.body.id) {
+    //     return res.status(400).json({ error: "Missing required field: id" });
+    //   }
+
+    //   const testCaseID = req.body.id;
+
+    //   try {
+    //     // Call the function to read the test case by ID
+    //     const result = await readTestCaseByID(contract, testCaseID);
+
+    //     // If no result found, handle it gracefully
+    //     if (!result) {
+    //       return res.status(404).json({
+    //         error: `Test case with ID ${testCaseID} not found.`,
+    //       });
+    //     }
+
+    //     // Return success response with the retrieved test case data
+    //     res.status(200).json({
+    //       status: "success",
+    //       message: "Test case retrieved successfully",
+    //       data: result, // Include the retrieved test case data in the response
+    //     });
+    //   } catch (error: unknown) {
+    //     console.error("Error reading test case by ID:", error);
+
+    //     // Handle known error type for clearer debugging
+    //     if (error instanceof Error) {
+    //       return res.status(500).json({ error: error.message });
+    //     }
+
+    //     // Handle any unknown error type
+    //     return res
+    //       .status(500)
+    //       .json({ error: "Unknown error occurred while retrieving test case" });
+    //   }
+    // });
+
+    // // Delete a test case
+    // app.delete("/deleteTestCase", async (req: any, res: any) => {
+    //   console.log("Received request body:", req.body);
+
+    //   // Check if the required 'id' field is present in the request body
+    //   if (!req.body.id) {
+    //     return res.status(400).json({ error: "Missing required field: id" });
+    //   }
+
+    //   try {
+    //     // Call the deleteTestCase function to delete the test case
+    //     await deleteTestCase(contract, req.body.id);
+
+    //     // Return success message upon successful deletion
+    //     const successMessage = {
+    //       status: "success",
+    //       message: "Test case deleted successfully",
+    //     };
+    //     res.status(200).json(successMessage); // Send response with a 200 OK status
+    //   } catch (error: unknown) {
+    //     console.error("Error deleting test case:", error);
+
+    //     // Handle different types of errors gracefully
+    //     if (error instanceof Error) {
+    //       res.status(500).json({ error: error.message }); // Return specific error message
+    //     } else {
+    //       res.status(500).json({ error: "Unknown error occurred" }); // Generic error message for unknown errors
+    //     }
+    //   }
+    // });
 
     app.get("/getAllTestPlans", async (req: any, res: any) => {
       try {
@@ -409,255 +659,7 @@ async function main(): Promise<void> {
       }
     });
 
-    // Create a new asset on the ledger.
-    app.post("/createTestCase", async (req: any, res: any) => {
-      console.log("Received request body:", req.body);
 
-      // Validate required fields
-      const requiredFields = [
-        "id",
-        "tcdesc",
-        "dl",
-        "pid",
-        "tcn",
-        "dtc",
-        "usrn",
-        "ostts",
-        "tcSteps",
-      ];
-
-      for (let field of requiredFields) {
-        if (!req.body[field]) {
-          return res
-            .status(400)
-            .json({ error: `Missing required field: ${field}` });
-        }
-      }
-
-      const { id, tcdesc, dl, pid, tcn, dtc, usrn, ostts, tcSteps } = req.body;
-
-      console.log("Creating Test Case:");
-      console.log(`Test Case ID: ${id}`);
-      console.log(`Description: ${tcdesc}, DL: ${dl}, PID: ${pid}`);
-      console.log(`Test Case Number: ${tcn}, Date Created: ${dtc}`);
-      console.log(`Username: ${usrn}, Status: ${ostts}`);
-      console.log(`Test Case Steps: ${tcSteps.length} steps`);
-
-      try {
-        // Call the function to create the test case
-        await createAsset(
-          contract,
-          id,
-          tcdesc,
-          dl,
-          pid,
-          tcn,
-          dtc,
-          usrn,
-          ostts,
-          tcSteps
-        );
-
-        const successMessage = {
-          status: "success",
-          message: "*** Transaction createAsset committed successfully",
-        };
-
-        res.status(200).json(successMessage);
-      } catch (error) {
-        console.error("Error creating test case:", error);
-
-        // Return a detailed error message
-        if (error instanceof Error) {
-          return res.status(500).json({ error: error.message });
-        }
-
-        // Return a generic error if the error type is unknown
-        return res.status(500).json({
-          error: "An unexpected error occurred while creating the test case.",
-        });
-      }
-    });
-
-    // Update a test case
-    app.post("/updateTestCase", async (req: any, res: any) => {
-      console.log("Received request body:", req.body);
-
-      // Check if the required fields are present in the request body
-      const requiredFields = [
-        "id",
-        "tcdesc",
-        "dl",
-        "pid",
-        "tcn",
-        "dtc",
-        "usrn",
-        "ostts",
-      ];
-
-      for (let field of requiredFields) {
-        if (!req.body[field]) {
-          return res
-            .status(400)
-            .json({ error: `Missing required field: ${field}` });
-        }
-      }
-
-      const { id, tcdesc, dl, pid, tcn, dtc, usrn, ostts } = req.body;
-
-      console.log("Update Test Case:");
-      console.log(`Test Case ID: ${id}`);
-      console.log(
-        `Description: ${tcdesc}, DL: ${dl}, PID: ${pid}, Test Case Number: ${tcn}`
-      );
-      console.log(`Date Created: ${dtc}, Username: ${usrn}, Status: ${ostts}`);
-
-      try {
-        // Call the function to update the test case
-        await UpdateAsset(contract, id, tcdesc, dl, pid, tcn, dtc, usrn, ostts);
-
-        const successMessage = {
-          status: "success",
-          message: "Test case updated successfully",
-        };
-
-        res.status(200).json(successMessage);
-      } catch (error) {
-        console.error("Error updating test case:", error);
-
-        // Handle known error type for clearer debugging
-        if (error instanceof Error) {
-          return res.status(500).json({ error: error.message });
-        }
-
-        // Handle any unknown error type
-        return res
-          .status(500)
-          .json({ error: "Unknown error occurred while updating test case" });
-      }
-    });
-
-    // Update overall status of a test case
-    app.post("/updateTestCaseStatus", async (req: any, res: any) => {
-      console.log("Received request body:", req.body);
-
-      // Check if the required fields ('id' and 'ostts') are present
-      if (!req.body.id || !req.body.ostts) {
-        return res
-          .status(400)
-          .json({ error: "Missing required fields: id or ostts" });
-      }
-
-      const testCaseID = req.body.id;
-      const newStatus = req.body.ostts;
-
-      console.log("Update Test Case Status:");
-      console.log(`Test Case ID: ${testCaseID}, New Status: ${newStatus}`);
-
-      try {
-        // Call the function to update the test case status
-        const result = await UpdateTestCaseStatus(
-          contract,
-          testCaseID,
-          newStatus
-        );
-
-        // If the update is successful, return a success message
-        const successMessage = {
-          status: "success",
-          message: "Test case status updated successfully",
-        };
-
-        // Send back the success message
-        res.status(200).json(successMessage);
-      } catch (error: unknown) {
-        console.error("Error updating test case status:", error);
-
-        // Handle known error type for clearer debugging
-        if (error instanceof Error) {
-          return res.status(500).json({ error: error.message });
-        }
-
-        // Handle any unknown error type
-        return res.status(500).json({
-          error: "Unknown error occurred while updating test case status",
-        });
-      }
-    });
-
-    // Get test case by ID
-    app.post("/readTestCaseByID", async (req: any, res: any) => {
-      console.log("Received request body:", req.body);
-
-      // Check if 'id' is present in the request body
-      if (!req.body.id) {
-        return res.status(400).json({ error: "Missing required field: id" });
-      }
-
-      const testCaseID = req.body.id;
-
-      try {
-        // Call the function to read the test case by ID
-        const result = await readTestCaseByID(contract, testCaseID);
-
-        // If no result found, handle it gracefully
-        if (!result) {
-          return res.status(404).json({
-            error: `Test case with ID ${testCaseID} not found.`,
-          });
-        }
-
-        // Return success response with the retrieved test case data
-        res.status(200).json({
-          status: "success",
-          message: "Test case retrieved successfully",
-          data: result, // Include the retrieved test case data in the response
-        });
-      } catch (error: unknown) {
-        console.error("Error reading test case by ID:", error);
-
-        // Handle known error type for clearer debugging
-        if (error instanceof Error) {
-          return res.status(500).json({ error: error.message });
-        }
-
-        // Handle any unknown error type
-        return res
-          .status(500)
-          .json({ error: "Unknown error occurred while retrieving test case" });
-      }
-    });
-
-    // Delete a test case
-    app.delete("/deleteTestCase", async (req: any, res: any) => {
-      console.log("Received request body:", req.body);
-
-      // Check if the required 'id' field is present in the request body
-      if (!req.body.id) {
-        return res.status(400).json({ error: "Missing required field: id" });
-      }
-
-      try {
-        // Call the deleteTestCase function to delete the test case
-        await deleteTestCase(contract, req.body.id);
-
-        // Return success message upon successful deletion
-        const successMessage = {
-          status: "success",
-          message: "Test case deleted successfully",
-        };
-        res.status(200).json(successMessage); // Send response with a 200 OK status
-      } catch (error: unknown) {
-        console.error("Error deleting test case:", error);
-
-        // Handle different types of errors gracefully
-        if (error instanceof Error) {
-          res.status(500).json({ error: error.message }); // Return specific error message
-        } else {
-          res.status(500).json({ error: "Unknown error occurred" }); // Generic error message for unknown errors
-        }
-      }
-    });
 
     //create test plan
     app.post("/createTestPlan", async (req: any, res: any) => {
@@ -1337,8 +1339,8 @@ async function main(): Promise<void> {
       console.log("Create Role:");
       console.log(req.body);
       if (!contract) {
-          return res.status(500).json({ error: "Contract not initialized" });
-      } 
+        return res.status(500).json({ error: "Contract not initialized" });
+      }
       try {
         await createRole(
           contract,
@@ -1613,6 +1615,156 @@ async function main(): Promise<void> {
       }
     });
 
+    /*********Test Case APIs Functions***********/
+
+    // CREATE TEST CASE
+    app.post("/createTestCase", async (req: any, res: any) => {
+      console.log("Create Test Case:");
+      console.log(req.body);
+      const contract = network.getContract("basic", "TestCaseContract");
+
+      try {
+        await createTestCase(
+          contract,
+          req.body.idtest_cases,
+          req.body.test_desc,
+          req.body.deadline,
+          req.body.dateUpdated,
+          req.body.projectId,
+          req.body.reason,
+          req.body.testCaseName,
+          req.body.dateCreated,
+          JSON.stringify(req.body.userID),
+          JSON.stringify(req.body.userStatuses),
+          req.body.overallStatus,
+          req.body.username,
+          req.body.createdBy,
+          req.body.status,
+          JSON.stringify(req.body.userReasons),
+          JSON.stringify(req.body.tcSteps),
+          JSON.stringify(req.body.expectedResults)
+        );
+
+        res.json({
+          status: "success",
+          message: "*** Transaction createTestCase committed successfully",
+        });
+      } catch (error: unknown) {
+        handleBlockchainError(res, error, "create test case");
+      }
+    });
+
+    // READ TEST CASE
+    app.get("/getTestCase/:id", async (req: any, res: any) => {
+      const testCaseId = req.params.id;
+      console.log(`Get Test Case: ${testCaseId}`);
+      const contract = network.getContract("basic", "TestCaseContract");
+
+      try {
+        const result = await readTestCase(contract, testCaseId);
+        res.json({ status: "success", message: result });
+      } catch (error: unknown) {
+        handleBlockchainError(res, error, "get test case");
+      }
+    });
+
+    // UPDATE TEST CASE
+    app.put("/updateTestCase", async (req: any, res: any) => {
+      console.log("Update Test Case:");
+      console.log(req.body);
+      const contract = network.getContract("basic", "TestCaseContract");
+
+      try {
+        await updateTestCase(
+          contract,
+          req.body.idtest_cases,
+          req.body.test_desc,
+          req.body.deadline,
+          req.body.dateUpdated,
+          req.body.projectId,
+          req.body.reason,
+          req.body.testCaseName,
+          req.body.dateCreated,
+          JSON.stringify(req.body.userID),
+          JSON.stringify(req.body.userStatuses),
+          req.body.overallStatus,
+          req.body.username,
+          req.body.createdBy,
+          req.body.status,
+          JSON.stringify(req.body.userReasons),
+          JSON.stringify(req.body.tcSteps),
+          JSON.stringify(req.body.expectedResults)
+        );
+        res.json({
+          status: "success",
+          message: "*** Transaction updateTestCase committed successfully",
+        });
+      } catch (error: unknown) {
+        handleBlockchainError(res, error, "update test case");
+      }
+    });
+
+    // DELETE TEST CASE
+    app.delete("/deleteTestCase/:id", async (req: any, res: any) => {
+      const testCaseId = req.params.id;
+      console.log(`Delete Test Case: ${testCaseId}`);
+      const contract = network.getContract("basic", "TestCaseContract");
+
+      try {
+        await deleteTestCase(contract, testCaseId);
+        res.json({ status: "success", message: `Test Case ${testCaseId} deleted successfully` });
+      } catch (error: unknown) {
+        handleBlockchainError(res, error, "delete test case");
+      }
+    });
+
+    // GET ALL TEST CASES
+    app.get("/getAllTestCases", async (req: any, res: any) => {
+      const contract = network.getContract("basic", "TestCaseContract");
+
+      try {
+        const allResults = await getAllTestCases(contract);
+        const successMessage = { status: 'success', message: allResults };
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).json(successMessage);
+      } catch (error: unknown) {
+        console.error("Error retrieving test cases:", error);
+        res.setHeader('Content-Type', 'application/json');
+        res.status(500).json({ status: 'error', message: 'Failed to retrieve test cases', error: error.message });
+      }
+    });
+
+    // GET ALL TEST CASES WITH HISTORY
+    app.get("/getAllTestCasesWithHistory", async (req: any, res: any) => {
+      const contract = network.getContract("basic", "TestCaseContract");
+
+      try {
+        const allResults = await getAllTestCasesWithHistory(contract);
+        const successMessage = { status: 'success', message: allResults };
+        res.send(JSON.stringify(successMessage));
+      } catch (error) {
+        console.error('Error fetching test cases:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to fetch test cases' });
+      }
+    });
+
+
+    function handleBlockchainError(res: any, error: unknown, label: string) {
+      if (error instanceof HttpError) {
+        console.error(`Failed to ${label}: ${error.message}`);
+        res
+          .status(error.statusCode)
+          .json({ status: error.statusCode, error: error.message });
+      } else if (error instanceof Error) {
+        console.error(`Failed to ${label}: ${error.message}`);
+        res.status(500).json({ error: error.message });
+      } else {
+        console.error(`Failed to ${label}: Unknown error`);
+        res.status(500).json({ error: "Unknown error occurred" });
+      }
+    }
+
+
     app.listen(port, () => {
       console.log(`Example app listening on port ${port}`);
     });
@@ -1707,39 +1859,39 @@ async function newSigner(): Promise<Signer> {
 /**
  * Evaluate a transaction to query ledger state.
  */
-async function getAllTestCases(contract: Contract): Promise<void> {
-  console.log(
-    "\n--> Evaluate Transaction: GetAllTestCases, function returns all the current test cases on the ledger"
-  );
+// async function getAllTestCases(contract: Contract): Promise<void> {
+//   console.log(
+//     "\n--> Evaluate Transaction: GetAllTestCases, function returns all the current test cases on the ledger"
+//   );
 
-  const resultBytes = await contract.evaluateTransaction("GetAllAssets");
+//   const resultBytes = await contract.evaluateTransaction("GetAllAssets");
 
-  const resultJson = utf8Decoder.decode(resultBytes);
-  const result = JSON.parse(resultJson);
-  console.log("*** Result:", result);
-  return result;
-}
+//   const resultJson = utf8Decoder.decode(resultBytes);
+//   const result = JSON.parse(resultJson);
+//   console.log("*** Result:", result);
+//   return result;
+// }
 
-async function getAllTestCasesWithHistory(contract: Contract): Promise<void> {
-  console.log(
-    "\n--> Evaluate Transaction: GetAllTestCasesWithHistory, function returns all the current test cases with their history on the ledger"
-  );
+// async function getAllTestCasesWithHistory(contract: Contract): Promise<void> {
+//   console.log(
+//     "\n--> Evaluate Transaction: GetAllTestCasesWithHistory, function returns all the current test cases with their history on the ledger"
+//   );
 
-  const resultBytes = await contract.evaluateTransaction(
-    "GetAllAssetsWithHistory"
-  );
+//   const resultBytes = await contract.evaluateTransaction(
+//     "GetAllAssetsWithHistory"
+//   );
 
-  const resultJson = utf8Decoder.decode(resultBytes);
-  const result = JSON.parse(resultJson);
+//   const resultJson = utf8Decoder.decode(resultBytes);
+//   const result = JSON.parse(resultJson);
 
-  // Filter assets that have the property `idtest_cases`
-  const filteredAssets = result.filter(
-    (asset: any) => asset.history[0]?.Value?.idtest_cases !== undefined
-  );
+//   // Filter assets that have the property `idtest_cases`
+//   const filteredAssets = result.filter(
+//     (asset: any) => asset.history[0]?.Value?.idtest_cases !== undefined
+//   );
 
-  console.log("*** Result:", filteredAssets);
-  return filteredAssets;
-}
+//   console.log("*** Result:", filteredAssets);
+//   return filteredAssets;
+// }
 
 /**
  * Submit a transaction synchronously, blocking until it has been committed to the ledger.
@@ -2355,16 +2507,16 @@ async function getClientID(contract: Contract): Promise<string> {
 // }
 
 // DeleteTestCase deletes an asset from the ledger
-async function deleteTestCase(contract: Contract, id: string): Promise<void> {
-  console.log(
-    "\n--> Submit Transaction: DeleteAsset, function deletes asset from the ledger"
-  );
+// async function deleteTestCase(contract: Contract, id: string): Promise<void> {
+//   console.log(
+//     "\n--> Submit Transaction: DeleteAsset, function deletes asset from the ledger"
+//   );
 
-  // Submit transaction to delete the asset
-  await contract.submitTransaction("DeleteAsset", id);
+//   // Submit transaction to delete the asset
+//   await contract.submitTransaction("DeleteAsset", id);
 
-  console.log("*** Transaction committed successfully (Test Case deleted)");
-}
+//   console.log("*** Transaction committed successfully (Test Case deleted)");
+// }
 
 // DELETE TEST PLAN
 async function deleteTestPlan(contract: Contract, tpID: string): Promise<void> {
@@ -2637,6 +2789,134 @@ async function getAllUsers(contract: Contract): Promise<any> {
 
   const resultBytes = await contract.evaluateTransaction("GetAllUsers");
   const resultJson = utf8Decoder.decode(resultBytes);
+  const result = JSON.parse(resultJson);
+  console.log("*** Result:", result);
+  return result;
+}
+
+/*********Test Case Module Helper Functions***********/
+
+// CREATE TEST CASE
+async function createTestCase(
+  contract: Contract,
+  idtest_cases: string,
+  test_desc: string,
+  deadline: string,
+  dateUpdated: string,
+  projectId: string,
+  reason: string,
+  testCaseName: string,
+  dateCreated: string,
+  userID: string,
+  userStatuses: string,
+  overallStatus: string,
+  username: string,
+  createdBy: string,
+  status: string,
+  userReasons: string,
+  tcSteps: string,
+  expectedResults: string
+): Promise<void> {
+  console.log("--> Submit Transaction: CreateTestCase");
+  await contract.submitTransaction(
+    "CreateTestCase",
+    idtest_cases,
+    test_desc,
+    deadline,
+    dateUpdated,
+    projectId,
+    reason,
+    testCaseName,
+    dateCreated,
+    userID,
+    userStatuses,
+    overallStatus,
+    username,
+    createdBy,
+    status,
+    userReasons,
+    tcSteps,
+    expectedResults
+  );
+  console.log("*** Test Case created successfully");
+}
+
+// READ TEST CASE
+async function readTestCase(contract: Contract, testCaseId: string): Promise<any> {
+  console.log("--> Evaluate Transaction: ReadTestCase");
+  const result = await contract.evaluateTransaction("ReadTestCase", testCaseId);
+  const jsonString = Buffer.from(result).toString("utf8");
+  console.log("Decoded JSON string:", jsonString);
+  return JSON.parse(jsonString);
+}
+
+// UPDATE TEST CASE
+async function updateTestCase(
+  contract: Contract,
+  idtest_cases: string,
+  test_desc: string,
+  deadline: string,
+  dateUpdated: string,
+  projectId: string,
+  reason: string,
+  testCaseName: string,
+  dateCreated: string,
+  userID: string,
+  userStatuses: string,
+  overallStatus: string,
+  username: string,
+  createdBy: string,
+  status: string,
+  userReasons: string,
+  tcSteps: string,
+  expectedResults: string
+): Promise<void> {
+  console.log("--> Submit Transaction: UpdateTestCase");
+  await contract.submitTransaction(
+    "UpdateTestCase",
+    idtest_cases,
+    test_desc,
+    deadline,
+    dateUpdated,
+    projectId,
+    reason,
+    testCaseName,
+    dateCreated,
+    userID,
+    userStatuses,
+    overallStatus,
+    username,
+    createdBy,
+    status,
+    userReasons,
+    tcSteps,
+    expectedResults
+  );
+  console.log("*** Test Case updated successfully");
+}
+
+// DELETE TEST CASE
+async function deleteTestCase(contract: Contract, testCaseId: string): Promise<void> {
+  console.log("--> Submit Transaction: DeleteTestCase");
+  await contract.submitTransaction("DeleteTestCase", testCaseId);
+  console.log("*** Test Case deleted successfully");
+}
+
+// GET ALL TEST CASES
+async function getAllTestCases(contract: Contract): Promise<any> {
+  console.log("--> Evaluate Transaction: GetAllTestCases");
+  const resultBytes = await contract.evaluateTransaction("GetAllTestCases");
+  const resultJson = Buffer.from(resultBytes).toString("utf8");
+  const result = JSON.parse(resultJson);
+  console.log("*** Result:", result);
+  return result;
+}
+
+// GET ALL TEST CASES WITH HISTORY
+async function getAllTestCasesWithHistory(contract: Contract): Promise<any> {
+  console.log("--> Evaluate Transaction: GetAllTestCasesWithHistory");
+  const resultBytes = await contract.evaluateTransaction("GetAllTestCasesWithHistory");
+  const resultJson = Buffer.from(resultBytes).toString("utf8");
   const result = JSON.parse(resultJson);
   console.log("*** Result:", result);
   return result;
