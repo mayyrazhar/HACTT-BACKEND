@@ -225,5 +225,8 @@ export class TestCaseAsset {
 
   @Property()
   public expectedResults: string; // Store JSON.stringify(["Expected A", "Expected B"])
+
+  @Property()
+  public testCaseVersion: string;
 }
 

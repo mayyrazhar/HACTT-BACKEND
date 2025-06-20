@@ -31,7 +31,8 @@ export class TestCaseContract extends Contract {
         status: string,
         userReasons: string,
         tcSteps: string,
-        expectedResults: string
+        expectedResults: string,
+        testCaseVersion: string
     ): Promise<void> {
         const exists = await this.TestCaseExists(ctx, idtest_cases);
         if (exists) {
@@ -56,6 +57,7 @@ export class TestCaseContract extends Contract {
             userReasons,
             tcSteps,
             expectedResults,
+            testCaseVersion,
         };
 
         await ctx.stub.putState(idtest_cases, Buffer.from(JSON.stringify(testCase)));
@@ -90,7 +92,8 @@ export class TestCaseContract extends Contract {
         status: string,
         userReasons: string,
         tcSteps: string,
-        expectedResults: string
+        expectedResults: string,
+        testCaseVersion: string
     ): Promise<void> {
         const exists = await this.TestCaseExists(ctx, idtest_cases);
         if (!exists) {
@@ -115,6 +118,7 @@ export class TestCaseContract extends Contract {
             userReasons,
             tcSteps,
             expectedResults,
+            testCaseVersion,
         };
 
         await ctx.stub.putState(idtest_cases, Buffer.from(JSON.stringify(updated)));

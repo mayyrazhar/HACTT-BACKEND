@@ -1642,7 +1642,8 @@ async function main(): Promise<void> {
           req.body.status,
           JSON.stringify(req.body.userReasons),
           JSON.stringify(req.body.tcSteps),
-          JSON.stringify(req.body.expectedResults)
+          JSON.stringify(req.body.expectedResults),
+          req.body.testCaseVersion
         );
 
         res.json({
@@ -1693,7 +1694,8 @@ async function main(): Promise<void> {
           req.body.status,
           JSON.stringify(req.body.userReasons),
           JSON.stringify(req.body.tcSteps),
-          JSON.stringify(req.body.expectedResults)
+          JSON.stringify(req.body.expectedResults),
+          req.body.testCaseVersion
         );
         res.json({
           status: "success",
@@ -2815,7 +2817,8 @@ async function createTestCase(
   status: string,
   userReasons: string,
   tcSteps: string,
-  expectedResults: string
+  expectedResults: string,
+  testCaseVersion: string
 ): Promise<void> {
   console.log("--> Submit Transaction: CreateTestCase");
   await contract.submitTransaction(
@@ -2836,7 +2839,8 @@ async function createTestCase(
     status,
     userReasons,
     tcSteps,
-    expectedResults
+    expectedResults,
+    testCaseVersion
   );
   console.log("*** Test Case created successfully");
 }
@@ -2869,7 +2873,8 @@ async function updateTestCase(
   status: string,
   userReasons: string,
   tcSteps: string,
-  expectedResults: string
+  expectedResults: string,
+  testCaseVersion: string
 ): Promise<void> {
   console.log("--> Submit Transaction: UpdateTestCase");
   await contract.submitTransaction(
@@ -2890,7 +2895,8 @@ async function updateTestCase(
     status,
     userReasons,
     tcSteps,
-    expectedResults
+    expectedResults,
+    testCaseVersion
   );
   console.log("*** Test Case updated successfully");
 }
